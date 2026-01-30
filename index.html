@@ -6,146 +6,110 @@
     <title>Elektrihinna Jälgija</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f9; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 800px; width: 100%; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); text-align: center; box-sizing: border-box; }
-        .status-box { padding: 30px 20px; border-radius: 18px; margin-bottom: 20px; transition: all 0.3s ease; }
-        .price-value { font-size: 3.8em; font-weight: 800; margin: 0; display: flex; justify-content: center; align-items: baseline; gap: 5px; }
-        .unit { font-size: 0.4em; font-weight: 600; opacity: 0.8; }
-        .cheap { background: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
-        .normal { background: #fffaf0; color: #744210; border: 1px solid #fbd38d; }
-        .expensive { background: #fff5f5; color: #742a2a; border: 1px solid #feb2b2; }
-        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
-        h2 { margin: 10px 0; color: #2d3748; }
-        #date-info { font-size: 0.85em; color: #718096; margin-bottom: 15px; }
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 600px; width: 100%; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        .status-box { padding: 30px; border-radius: 15px; margin-bottom: 20px; }
+        .price-value { font-size: 3.5em; font-weight: bold; }
+        .cheap { background: #dcfce7; color: #166534; }
+        .normal { background: #fef9c3; color: #854d0e; }
+        .expensive { background: #fee2e2; color: #991b1b; }
+        .chart-container { height: 300px; width: 100%; }
+        #loader { padding: 50px; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="header-title">Elektri börsihind</h2>
-    <div id="date-info">Uuendan andmeid...</div>
+    <h2>Elektrihind Eestis</h2>
+    <div id="loader">Värskendan andmeid...</div>
     
     <div id="status-card" class="status-box" style="display:none;">
-        <div class="price-value"><span id="current-price">0.00</span> <span class="unit">s/kWh</span></div>
-        <p id="trend-text" style="font-weight: 600; margin-top: 10px; font-size: 1.1em;"></p>
+        <div class="price-value"><span id="current-price">0.00</span> <small style="font-size: 0.4em;">s/kWh</small></div>
+        <p id="trend-text" style="font-weight: bold; margin-top: 10px;"></p>
     </div>
-
-    <div id="loader">Ootan andmeid Eleringist...</div>
 
     <div class="chart-container">
         <canvas id="priceChart"></canvas>
     </div>
+    <p style="font-size: 0.7em; color: #999; margin-top: 15px;">Andmed: Elering / Nord Pool (koos 22% KM)</p>
 </div>
 
 <script>
-    let priceChart;
-
     async function updateData() {
-        const dateInfo = document.getElementById('date-info');
-        const loader = document.getElementById('loader');
-        const statusCard = document.getElementById('status-card');
-
         try {
-            // Arvutame ajad: tänase algus ja homse lõpp
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+            // Küsime ainult kuni homse lõpuni
             const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
             
-            // Eleringi API kutse
-            const url = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
-            const response = await fetch(url);
+            // Kasutame PROXY-t, et vältida CORS viga
+            const apiUrl = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
             
-            if (!response.ok) throw new Error('API viga');
-            
+            const response = await fetch(proxyUrl);
             const json = await response.json();
             const eeData = json.data.ee;
 
-            if (!eeData || eeData.length === 0) throw new Error('Andmed puuduvad');
+            if (!eeData || eeData.length === 0) throw new Error("Andmeid pole");
 
             const labels = [];
             const prices = [];
-            const currentTimestamp = Math.floor(Date.now() / 1000 / 3600) * 3600;
-            let currentPrice = null;
+            const currentHourTimestamp = Math.floor(Date.now() / 1000 / 3600) * 3600;
+            let currentPrice = 0;
 
             eeData.forEach(item => {
                 const date = new Date(item.timestamp * 1000);
-                const hour = date.getHours();
-                const day = date.getDate() === now.getDate() ? "" : "H: ";
+                labels.push(`${date.getHours()}:00`);
+                const p = (item.price / 10 * 1.22).toFixed(2);
+                prices.push(parseFloat(p));
                 
-                labels.push(`${day}${hour}:00`);
-                // Arvutus: (Hind / 10) * 1.22 (KM)
-                const priceKWh = (item.price / 10 * 1.22).toFixed(2);
-                prices.push(parseFloat(priceKWh));
-
-                if (item.timestamp === currentTimestamp) {
-                    currentPrice = priceKWh;
+                if (item.timestamp === currentHourTimestamp) {
+                    currentPrice = p;
                 }
             });
 
-            // Kui täpset tunnihinda ei leitud, võta viimane saadavalolev
-            if (!currentPrice) currentPrice = prices[0];
+            if (currentPrice === 0) currentPrice = prices[0];
 
-            loader.style.display = 'none';
-            statusCard.style.display = 'block';
             renderUI(currentPrice, labels, prices);
-            dateInfo.innerText = `Viimane uuendus: ${now.toLocaleTimeString('et-EE')}`;
-
-        } catch (error) {
-            console.error(error);
-            loader.innerText = "Andmete viga! Kontrolli internetti või proovi uuesti.";
-            loader.style.color = "red";
+        } catch (e) {
+            document.getElementById('loader').innerText = "Viga: Eleringi server ei vasta. Proovi hetke pärast uuesti.";
+            console.error(e);
         }
     }
 
     function renderUI(price, labels, prices) {
-        document.getElementById('current-price').innerText = price;
+        document.getElementById('loader').style.display = 'none';
         const card = document.getElementById('status-card');
-        const trend = document.getElementById('trend-text');
+        card.style.display = 'block';
+        document.getElementById('current-price').innerText = price;
         
         const p = parseFloat(price);
-        if (p < 10) {
-            card.className = 'status-box cheap';
-            trend.innerText = "Soodne! Käivita pesumasin. ✅";
-        } else if (p < 20) {
-            card.className = 'status-box normal';
-            trend.innerText = "Mõistlik hind. ⚖️";
-        } else {
-            card.className = 'status-box expensive';
-            trend.innerText = "Kallis aeg. Hoia kokku. ❌";
-        }
+        const trend = document.getElementById('trend-text');
+        if (p < 10) { card.className = 'status-box cheap'; trend.innerText = "SOODNE ✅"; }
+        else if (p < 20) { card.className = 'status-box normal'; trend.innerText = "TAVALINE ⚖️"; }
+        else { card.className = 'status-box expensive'; trend.innerText = "KALLIS ❌"; }
 
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        if (priceChart) priceChart.destroy();
-
-        priceChart = new Chart(ctx, {
+        new Chart(document.getElementById('priceChart'), {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
                     data: prices,
-                    borderColor: '#3182ce',
-                    backgroundColor: 'rgba(49, 130, 206, 0.1)',
-                    borderWidth: 3,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: 0,
-                    pointHitRadius: 20
+                    tension: 0.3
                 }]
             },
-            options: {
-                responsive: true,
+            options: { 
+                responsive: true, 
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true },
-                    x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
-                }
+                plugins: { legend: { display: false } }
             }
         });
     }
 
     updateData();
 </script>
-
 </body>
 </html>
