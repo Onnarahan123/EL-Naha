@@ -16,11 +16,12 @@
             --apple-green: #34C759;
             --apple-blue: #007AFF;
             --apple-red: #FF3B30;
+            --apple-orange: #FF9500;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(180deg, #CFD9DF 0%, #E2EBF0 40%, #F2F2F7 100%);
+            background: linear-gradient(180deg, #dceefc 0%, #f0f4f8 100%);
             background-attachment: fixed;
             margin: 0;
             padding: 20px;
@@ -35,7 +36,7 @@
         .container {
             width: 100%;
             max-width: 600px;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
         }
 
         /* KAARDID */
@@ -46,68 +47,86 @@
             border-radius: 24px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-            border: 1px solid rgba(255,255,255,0.6);
-            transition: background-color 0.5s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.7);
+            transition: all 0.5s ease;
         }
 
         /* Värvilised taustad */
-        .bg-cheap { background-color: rgba(212, 237, 218, 0.95) !important; border-color: rgba(195, 230, 203, 0.8) !important; }
-        .bg-medium { background-color: rgba(219, 234, 254, 0.95) !important; border-color: rgba(191, 219, 254, 0.8) !important; }
-        .bg-expensive { background-color: rgba(248, 215, 218, 0.95) !important; border-color: rgba(245, 198, 203, 0.8) !important; }
+        .bg-cheap { background: linear-gradient(135deg, rgba(212,237,218,0.95), rgba(235,249,238,0.95)) !important; border-color: #c3e6cb !important; }
+        .bg-medium { background: linear-gradient(135deg, rgba(219,234,254,0.95), rgba(239,246,255,0.95)) !important; border-color: #bfdbfe !important; }
+        .bg-expensive { background: linear-gradient(135deg, rgba(248,215,218,0.95), rgba(254,242,242,0.95)) !important; border-color: #f5c6cb !important; }
 
         .card-mini {
             background: var(--card-bg);
             backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.6);
         }
 
         h2 {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             margin: 0 0 15px 0;
-            color: rgba(0,0,0,0.5);
+            color: rgba(0,0,0,0.4);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             text-align: center;
         }
 
         /* HETKEHIND */
-        .current-price-section { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .time-range-badge { font-size: 14px; font-weight: 500; color: rgba(0,0,0,0.6); margin-bottom: 2px; display: block; }
-        .big-price { font-size: 82px; font-weight: 800; letter-spacing: -4px; line-height: 1; display: block; color: #000; }
-        .unit { font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.6); margin-top: 5px; display: block; }
+        .current-price-section { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.08); margin-bottom: 15px; }
+        .time-range-badge { font-size: 15px; font-weight: 500; color: rgba(0,0,0,0.6); margin-bottom: 2px; }
+        .big-price { font-size: 82px; font-weight: 800; letter-spacing: -4px; line-height: 1; display: block; color: #1c1c1e; }
+        .unit { font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.5); margin-top: 5px; display: block; }
         
+        /* SOOVITUS RIBA */
+        .recommendation-box {
+            text-align: center;
+            font-size: 14px;
+            color: var(--apple-blue);
+            font-weight: 600;
+            background: rgba(0, 122, 255, 0.1);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
         /* STATISTIKA */
-        .stats-row { display: flex; justify-content: space-between; padding: 0 10px; }
+        .stats-row { display: flex; justify-content: space-between; padding: 0 5px; }
         .stat-item { text-align: center; flex: 1; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: rgba(0,0,0,0.5); font-weight: 600; margin-bottom: 4px; display: block; }
-        .stat-value { font-size: 18px; font-weight: 700; color: #000; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: rgba(0,0,0,0.5); font-weight: 700; margin-bottom: 4px; display: block; }
+        .stat-value { font-size: 17px; font-weight: 700; color: #1c1c1e; }
+
+        /* ILM */
+        .weather-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .weather-day { text-align: center; flex: 1; padding: 0 4px; }
+        .w-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+        .w-icon { font-size: 28px; display: block; margin: 4px 0; }
+        .w-temp { font-size: 14px; font-weight: 700; color: var(--text-primary); display: block; }
+        .w-wind { font-size: 11px; color: var(--text-secondary); margin-top: 2px; display: block; }
+        .w-divider { width: 1px; background: rgba(0,0,0,0.1); height: 50px; margin: 10px 0; }
 
         /* GRAAFIK */
         .segmented-control { display: flex; background: rgba(118, 118, 128, 0.12); padding: 2px; border-radius: 9px; margin-bottom: 20px; }
         .segment-btn { flex: 1; border: none; padding: 6px 0; border-radius: 7px; font-size: 13px; font-weight: 600; background: transparent; color: #000; cursor: pointer; transition: all 0.2s ease; }
-        .segment-btn.active { background: #FFFFFF; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+        .segment-btn.active { background: #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .segment-btn:disabled { color: #aaa; cursor: not-allowed; }
-        .chart-wrapper { position: relative; height: 320px; width: 100%; }
+        .chart-wrapper { position: relative; height: 300px; width: 100%; }
 
-        /* UUS: ILMATEADE */
-        .weather-row { display: flex; justify-content: space-between; align-items: flex-start; }
-        .weather-day { text-align: center; flex: 1; padding: 5px; }
-        .w-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
-        .w-icon { font-size: 32px; display: block; margin: 5px 0; }
-        .w-temp { font-size: 16px; font-weight: 700; color: var(--text-primary); display: block; }
-        .w-wind { font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: block; }
-        .w-divider { width: 1px; background: rgba(0,0,0,0.1); height: 60px; margin: 10px 0; }
-
-        /* KALKULAATOR */
-        .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-        .calc-input { border: none; background: rgba(118, 118, 128, 0.12); padding: 8px; border-radius: 8px; font-size: 17px; font-weight: 600; width: 80px; text-align: center; outline: none; color: var(--apple-blue); }
+        /* KALKULAATOR JA PRESETID */
+        .presets-grid { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        .preset-btn { 
+            background: #fff; border: 1px solid #e5e5ea; border-radius: 12px; padding: 8px 12px; 
+            font-size: 20px; cursor: pointer; flex: 1; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .preset-btn:active { transform: scale(0.95); background: #f2f2f7; }
+        
+        .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 500; }
+        .calc-input { border: none; background: rgba(118, 118, 128, 0.12); padding: 10px; border-radius: 10px; font-size: 18px; font-weight: 600; width: 90px; text-align: center; outline: none; color: var(--apple-blue); }
 
         .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 30px; font-weight: 500; }
         #loading-overlay { font-size: 14px; color: var(--text-secondary); text-align: center; margin: 20px 0; }
@@ -145,9 +164,12 @@
     </div>
 
     <div class="card-mini">
-        <h2 style="margin-bottom:15px;">Ilm ja Tuul (Tallinn)</h2>
+        <div id="recommendation" class="recommendation-box" style="display:none;">
+            </div>
+
+        <h2 style="margin-bottom:12px; margin-top:5px;">Ilm (Võru)</h2>
         <div class="weather-row" id="weather-container">
-            <div style="width:100%; text-align:center; color:#888;">Laen ilmainfot...</div>
+            <div style="width:100%; text-align:center; color:#888; font-size:13px;">Laen ilmainfot...</div>
         </div>
     </div>
 
@@ -160,18 +182,29 @@
             <canvas id="priceChart"></canvas>
         </div>
         <div style="text-align: center; margin-top:10px;">
-            <button onclick="initApp()" style="background:none; border:none; color:var(--apple-blue); font-size:12px;">↻ Värskenda</button>
+            <button onclick="initApp()" style="background:none; border:none; color:var(--apple-blue); font-size:12px; font-weight:500;">↻ Värskenda</button>
         </div>
     </div>
 
     <div class="card-mini">
+        <h2 style="text-align:left; margin-bottom:10px;">Kalkulaator</h2>
+        
+        <div class="presets-grid">
+            <button class="preset-btn" onclick="setWatts(10, 'LED Lamp')">💡</button>
+            <button class="preset-btn" onclick="setWatts(2000, 'Pesumasin')">🧺</button>
+            <button class="preset-btn" onclick="setWatts(6000, 'Saun')">🧖‍♂️</button>
+            <button class="preset-btn" onclick="setWatts(11000, 'Auto laadija')">🚗</button>
+        </div>
+
         <div class="calc-row">
-            <span style="font-weight:600;">⚡ Kiirkalkulaator</span>
+            <span id="device-name">Seadme võimsus:</span>
             <div>
-                <input type="number" id="watts" value="1000" class="calc-input"> <span style="font-size:12px; color:#888;">W</span>
+                <input type="number" id="watts" value="2000" class="calc-input"> <span style="font-size:12px; color:#888;">W</span>
             </div>
         </div>
-        <div style="font-size: 13px; color: #8E8E93; margin-top: 8px; text-align: right;" id="calc-result">...</div>
+        <div style="font-size: 15px; font-weight:600; color: var(--text-primary); margin-top: 12px; text-align: right; border-top:1px solid #eee; padding-top:10px;" id="calc-result">
+            ...
+        </div>
     </div>
 
     <div class="footer">
@@ -190,13 +223,27 @@
     });
 
     const wattsInput = document.getElementById('watts');
-    wattsInput.addEventListener('input', updateCalculator);
+    wattsInput.addEventListener('input', () => updateCalculator());
+
+    function setWatts(val, name) {
+        wattsInput.value = val;
+        document.getElementById('device-name').innerText = name + ":";
+        updateCalculator();
+    }
 
     function updateCalculator() {
         const w = parseFloat(wattsInput.value) || 0;
-        const cost = (w / 1000) * currentPrice;
-        document.getElementById('calc-result').innerHTML = 
-            `Kulu hetkehinnaga: <b style="color:#000">${cost.toFixed(2)} s</b> / tunnis`;
+        const costCents = (w / 1000) * currentPrice;
+        
+        let text = `Kulu hetkel: ${costCents.toFixed(2)} senti / tund`;
+        
+        // Kui on väga suur tarbija (nt auto), näitame ka hinda eurodes
+        if (w > 3000) {
+            const costEur = costCents / 100;
+            text += ` <br><span style="color:#888; font-size:13px;">(€${costEur.toFixed(2)} / tund)</span>`;
+        }
+        
+        document.getElementById('calc-result').innerHTML = text;
     }
 
     function switchView(view) {
@@ -210,7 +257,6 @@
         const loading = document.getElementById('loading-overlay');
         const content = document.getElementById('price-content');
         
-        // Lae Ilm ja Hind paralleelselt
         getWeather(); 
         
         try {
@@ -253,11 +299,10 @@
             else if (currentPrice < 20) mainCard.classList.add('bg-medium');
             else mainCard.classList.add('bg-expensive');
 
-            // --- PÄEVA STATISTIKA ---
+            // --- PÄEVA STATISTIKA & PARIM AEG ---
             const todayDate = new Date().getDate();
-            const todayPrices = fullData
-                .filter(d => new Date(d.timestamp * 1000).getDate() === todayDate)
-                .map(d => (d.price / 10) * 1.22);
+            const todayItems = fullData.filter(d => new Date(d.timestamp * 1000).getDate() === todayDate);
+            const todayPrices = todayItems.map(d => (d.price / 10) * 1.22);
 
             if (todayPrices.length > 0) {
                 const min = Math.min(...todayPrices);
@@ -267,6 +312,27 @@
                 document.getElementById('day-min').innerText = min.toFixed(2);
                 document.getElementById('day-max').innerText = max.toFixed(2);
                 document.getElementById('day-avg').innerText = avg.toFixed(2);
+
+                // Leia odavaim tund tulevikus (tänase päeva jooksul)
+                const currentHourVal = new Date().getHours();
+                const futureItems = todayItems.filter(d => new Date(d.timestamp * 1000).getHours() >= currentHourVal);
+                
+                if (futureItems.length > 0) {
+                    // Sorteeri hinna järgi kasvavalt
+                    futureItems.sort((a, b) => a.price - b.price);
+                    const bestItem = futureItems[0];
+                    const bestPrice = ((bestItem.price / 10) * 1.22).toFixed(2);
+                    const bestTime = new Date(bestItem.timestamp * 1000).getHours();
+                    
+                    const recBox = document.getElementById('recommendation');
+                    recBox.style.display = 'block';
+                    
+                    if (bestTime === currentHourVal) {
+                        recBox.innerHTML = `🌟 Kasuta elektrit praegu! Hetkel on päeva soodsaim hind.`;
+                    } else {
+                        recBox.innerHTML = `💡 Soovitus: Tänane soodsaim aeg on kell <b>${bestTime}:00</b> (${bestPrice} s/kWh).`;
+                    }
+                }
             }
 
             // Kontrolli homset
@@ -296,10 +362,10 @@
 
     async function getWeather() {
         try {
-            // Tallinn koordinaadid (või Eesti keskmine)
-            const lat = 59.437;
-            const lon = 24.753;
-            // Küsime 3 päeva prognoosi: ilmakood, max/min temp, tuule kiirus
+            // VÕRU
+            const lat = 57.848;
+            const lon = 27.014;
+            
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto&forecast_days=3`;
             
             const resp = await fetch(url);
@@ -313,9 +379,8 @@
                 const code = daily.weather_code[i];
                 const maxT = Math.round(daily.temperature_2m_max[i]);
                 const minT = Math.round(daily.temperature_2m_min[i]);
-                const wind = Math.round(daily.wind_speed_10m_max[i] / 3.6); // km/h -> m/s
+                const wind = Math.round(daily.wind_speed_10m_max[i] / 3.6); 
 
-                // Ilmakoodid emojideks
                 let icon = "☁️";
                 if (code === 0) icon = "☀️";
                 else if (code >= 1 && code <= 3) icon = "⛅";
@@ -328,11 +393,10 @@
                     <div class="weather-day">
                         <span class="w-title">${daysMap[i]}</span>
                         <span class="w-icon">${icon}</span>
-                        <span class="w-temp">${minT}°...${maxT}°</span>
+                        <span class="w-temp">${minT}°..${maxT}°</span>
                         <span class="w-wind">💨 ${wind} m/s</span>
                     </div>
                 `;
-                // Lisa eraldaja, kui pole viimane
                 if (i < 2) html += `<div class="w-divider"></div>`;
             }
             document.getElementById('weather-container').innerHTML = html;
