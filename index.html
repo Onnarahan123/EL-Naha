@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Elektrihind</title>
+    <title>Elektrihind & Ilm</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* APPLE STYLE & CLEAN DESIGN */
@@ -20,7 +20,6 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Taustagradient */
             background: linear-gradient(180deg, #CFD9DF 0%, #E2EBF0 40%, #F2F2F7 100%);
             background-attachment: fixed;
             margin: 0;
@@ -49,13 +48,13 @@
             margin-bottom: 20px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.06);
             border: 1px solid rgba(255,255,255,0.6);
-            transition: background-color 0.5s ease; /* Sujuv värvivahetus */
+            transition: background-color 0.5s ease;
         }
 
-        /* Spetsiifilised taustad Hetkel kaardile */
-        .bg-cheap { background-color: rgba(212, 237, 218, 0.9) !important; border-color: rgba(195, 230, 203, 0.8) !important; }
-        .bg-medium { background-color: rgba(219, 234, 254, 0.9) !important; border-color: rgba(191, 219, 254, 0.8) !important; }
-        .bg-expensive { background-color: rgba(248, 215, 218, 0.9) !important; border-color: rgba(245, 198, 203, 0.8) !important; }
+        /* Värvilised taustad */
+        .bg-cheap { background-color: rgba(212, 237, 218, 0.95) !important; border-color: rgba(195, 230, 203, 0.8) !important; }
+        .bg-medium { background-color: rgba(219, 234, 254, 0.95) !important; border-color: rgba(191, 219, 254, 0.8) !important; }
+        .bg-expensive { background-color: rgba(248, 215, 218, 0.95) !important; border-color: rgba(245, 198, 203, 0.8) !important; }
 
         .card-mini {
             background: var(--card-bg);
@@ -78,75 +77,37 @@
             text-align: center;
         }
 
-        /* HETKEHIND JA STATISTIKA */
+        /* HETKEHIND */
         .current-price-section { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; }
-        
-        .time-range-badge {
-            font-size: 14px;
-            font-weight: 500;
-            color: rgba(0,0,0,0.6);
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        .big-price {
-            font-size: 82px;
-            font-weight: 800;
-            letter-spacing: -4px;
-            line-height: 1;
-            display: block;
-            color: #000;
-        }
+        .time-range-badge { font-size: 14px; font-weight: 500; color: rgba(0,0,0,0.6); margin-bottom: 2px; display: block; }
+        .big-price { font-size: 82px; font-weight: 800; letter-spacing: -4px; line-height: 1; display: block; color: #000; }
         .unit { font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.6); margin-top: 5px; display: block; }
         
-        /* PÄEVA STATISTIKA (Min/Avg/Max) */
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-        }
-        .stat-item {
-            text-align: center;
-            flex: 1;
-        }
-        .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: rgba(0,0,0,0.5);
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-        }
+        /* STATISTIKA */
+        .stats-row { display: flex; justify-content: space-between; padding: 0 10px; }
+        .stat-item { text-align: center; flex: 1; }
+        .stat-label { font-size: 11px; text-transform: uppercase; color: rgba(0,0,0,0.5); font-weight: 600; margin-bottom: 4px; display: block; }
+        .stat-value { font-size: 18px; font-weight: 700; color: #000; }
 
         /* GRAAFIK */
-        .segmented-control {
-            display: flex;
-            background: rgba(118, 118, 128, 0.12);
-            padding: 2px;
-            border-radius: 9px;
-            margin-bottom: 20px;
-        }
-        .segment-btn {
-            flex: 1; border: none; padding: 6px 0; border-radius: 7px;
-            font-size: 13px; font-weight: 600; background: transparent; color: #000;
-            cursor: pointer; transition: all 0.2s ease;
-        }
+        .segmented-control { display: flex; background: rgba(118, 118, 128, 0.12); padding: 2px; border-radius: 9px; margin-bottom: 20px; }
+        .segment-btn { flex: 1; border: none; padding: 6px 0; border-radius: 7px; font-size: 13px; font-weight: 600; background: transparent; color: #000; cursor: pointer; transition: all 0.2s ease; }
         .segment-btn.active { background: #FFFFFF; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
         .segment-btn:disabled { color: #aaa; cursor: not-allowed; }
-
         .chart-wrapper { position: relative; height: 320px; width: 100%; }
+
+        /* UUS: ILMATEADE */
+        .weather-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .weather-day { text-align: center; flex: 1; padding: 5px; }
+        .w-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+        .w-icon { font-size: 32px; display: block; margin: 5px 0; }
+        .w-temp { font-size: 16px; font-weight: 700; color: var(--text-primary); display: block; }
+        .w-wind { font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: block; }
+        .w-divider { width: 1px; background: rgba(0,0,0,0.1); height: 60px; margin: 10px 0; }
 
         /* KALKULAATOR */
         .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-        .calc-input {
-            border: none; background: rgba(118, 118, 128, 0.12); padding: 8px; border-radius: 8px;
-            font-size: 17px; font-weight: 600; width: 80px; text-align: center; outline: none; color: var(--apple-blue);
-        }
+        .calc-input { border: none; background: rgba(118, 118, 128, 0.12); padding: 8px; border-radius: 8px; font-size: 17px; font-weight: 600; width: 80px; text-align: center; outline: none; color: var(--apple-blue); }
 
         .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 30px; font-weight: 500; }
         #loading-overlay { font-size: 14px; color: var(--text-secondary); text-align: center; margin: 20px 0; }
@@ -166,7 +127,6 @@
                 <span class="big-price" id="current-price">--</span>
                 <span class="unit">senti / kWh</span>
             </div>
-
             <div class="stats-row">
                 <div class="stat-item">
                     <span class="stat-label">Min</span>
@@ -184,18 +144,23 @@
         </div>
     </div>
 
+    <div class="card-mini">
+        <h2 style="margin-bottom:15px;">Ilm ja Tuul (Tallinn)</h2>
+        <div class="weather-row" id="weather-container">
+            <div style="width:100%; text-align:center; color:#888;">Laen ilmainfot...</div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="segmented-control">
             <button class="segment-btn active" id="btn-today" onclick="switchView('today')">Täna</button>
             <button class="segment-btn" id="btn-tomorrow" onclick="switchView('tomorrow')">Homme</button>
         </div>
-
         <div class="chart-wrapper">
             <canvas id="priceChart"></canvas>
         </div>
-        
         <div style="text-align: center; margin-top:10px;">
-            <button onclick="initApp()" style="background:none; border:none; color:var(--apple-blue); font-size:12px;">↻ Värskenda andmeid</button>
+            <button onclick="initApp()" style="background:none; border:none; color:var(--apple-blue); font-size:12px;">↻ Värskenda</button>
         </div>
     </div>
 
@@ -245,13 +210,15 @@
         const loading = document.getElementById('loading-overlay');
         const content = document.getElementById('price-content');
         
+        // Lae Ilm ja Hind paralleelselt
+        getWeather(); 
+        
         try {
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
             const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
 
             let eeData = [];
-
             try {
                 const resp = await fetch(`https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`);
                 if (!resp.ok) throw new Error();
@@ -273,7 +240,6 @@
             const currentItem = fullData.find(d => Math.abs(d.timestamp - currentTs) < 600) || fullData[fullData.length-1];
             currentPrice = parseFloat(((currentItem.price / 10) * 1.22).toFixed(2));
 
-            // Kellaaeg
             const dateObj = new Date(currentItem.timestamp * 1000);
             const curHour = dateObj.getHours();
             const nextHour = (curHour + 1) % 24;
@@ -283,14 +249,9 @@
             // --- TAUSTAVÄRV ---
             const mainCard = document.getElementById('main-card');
             mainCard.classList.remove('bg-cheap', 'bg-medium', 'bg-expensive');
-            
-            if (currentPrice < 10) {
-                mainCard.classList.add('bg-cheap'); // Roheline
-            } else if (currentPrice < 20) {
-                mainCard.classList.add('bg-medium'); // Sinine
-            } else {
-                mainCard.classList.add('bg-expensive'); // Punane
-            }
+            if (currentPrice < 10) mainCard.classList.add('bg-cheap');
+            else if (currentPrice < 20) mainCard.classList.add('bg-medium');
+            else mainCard.classList.add('bg-expensive');
 
             // --- PÄEVA STATISTIKA ---
             const todayDate = new Date().getDate();
@@ -333,6 +294,55 @@
         }
     }
 
+    async function getWeather() {
+        try {
+            // Tallinn koordinaadid (või Eesti keskmine)
+            const lat = 59.437;
+            const lon = 24.753;
+            // Küsime 3 päeva prognoosi: ilmakood, max/min temp, tuule kiirus
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto&forecast_days=3`;
+            
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const daily = data.daily;
+            
+            const daysMap = ["Täna", "Homme", "Ülehomme"];
+            let html = "";
+
+            for(let i=0; i<3; i++) {
+                const code = daily.weather_code[i];
+                const maxT = Math.round(daily.temperature_2m_max[i]);
+                const minT = Math.round(daily.temperature_2m_min[i]);
+                const wind = Math.round(daily.wind_speed_10m_max[i] / 3.6); // km/h -> m/s
+
+                // Ilmakoodid emojideks
+                let icon = "☁️";
+                if (code === 0) icon = "☀️";
+                else if (code >= 1 && code <= 3) icon = "⛅";
+                else if (code >= 45 && code <= 48) icon = "🌫️";
+                else if (code >= 51 && code <= 67) icon = "🌧️";
+                else if (code >= 71 && code <= 77) icon = "❄️";
+                else if (code >= 95) icon = "⛈️";
+
+                html += `
+                    <div class="weather-day">
+                        <span class="w-title">${daysMap[i]}</span>
+                        <span class="w-icon">${icon}</span>
+                        <span class="w-temp">${minT}°...${maxT}°</span>
+                        <span class="w-wind">💨 ${wind} m/s</span>
+                    </div>
+                `;
+                // Lisa eraldaja, kui pole viimane
+                if (i < 2) html += `<div class="w-divider"></div>`;
+            }
+            document.getElementById('weather-container').innerHTML = html;
+
+        } catch (e) {
+            console.error("Ilma viga:", e);
+            document.getElementById('weather-container').innerHTML = "Ilmainfot ei saanud laadida.";
+        }
+    }
+
     function renderChart() {
         if (fullData.length === 0) return;
 
@@ -363,7 +373,7 @@
             let color = '#007AFF';
             if (price < 10) color = '#34C759';
             else if (price >= 20) color = '#FF3B30';
-            else if (price >= 10) color = '#FF9500'; // Graafikus jätame keskmise oranžiks, et paremini eristuks sinisest taustast
+            else if (price >= 10) color = '#FF9500';
 
             bgColors.push(color);
 
