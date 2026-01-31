@@ -2,209 +2,394 @@
 <html lang="et">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elektrihinna Jälgija (Parandatud)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Elektrihind</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px 10px; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { text-align: center; margin-top: 0; color: #2c3e50; }
-        
-        .status-box { padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 25px; color: white; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .price-large { font-size: 4em; font-weight: 800; line-height: 1; }
-        .unit-large { font-size: 0.5em; opacity: 0.8; }
-        .trend-text { font-weight: 600; margin-top: 10px; font-size: 1.1em; }
-        
-        .bg-cheap { background: linear-gradient(135deg, #28a745, #85dcb0); }
-        .bg-normal { background: linear-gradient(135deg, #fd7e14, #fce38a); color: #333; }
-        .bg-expensive { background: linear-gradient(135deg, #dc3545, #f3a6b2); }
+        /* APPLE STYLE & CLEAN DESIGN */
+        :root {
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --apple-green: #34C759;
+            --apple-orange: #FF9500;
+            --apple-red: #FF3B30;
+            --apple-blue: #007AFF;
+        }
 
-        .calculator-section { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
-        .calc-title { margin: 0 0 15px 0; font-size: 1.2em; color: #495057; display: flex; align-items: center; }
-        .calc-input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-        .calc-input-group input { padding: 12px; border: 2px solid #ced4da; border-radius: 8px; font-size: 16px; width: 120px; text-align: center; }
-        .calc-result { font-weight: bold; color: #2563eb; font-size: 1.1em; }
-        .small-info { font-size: 0.9em; color: #6c757d; margin-top: 5px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-        .chart-container { position: relative; height: 400px; width: 100%; }
-        #error-message { color: red; text-align: center; display: none; margin-bottom: 10px; }
+        .container {
+            width: 100%;
+            max-width: 600px; /* Telefonisõbralik laius */
+            padding-bottom: 40px;
+        }
+
+        /* KAARDID */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            backdrop-filter: blur(20px); /* Klaasi efekt */
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* HETKEHIND (Suur number) */
+        .price-display {
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .big-price {
+            font-size: 80px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1;
+            display: block;
+        }
+
+        .unit {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* KALKULAATOR */
+        .input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F2F2F7;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        
+        input {
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            font-weight: 600;
+            width: 100px;
+            text-align: right;
+            outline: none;
+            color: var(--apple-blue);
+        }
+
+        .calc-result {
+            margin-top: 15px;
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        .calc-highlight { color: var(--text-primary); font-weight: 600; }
+
+        /* GRAAFIK */
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        /* Loading & Error */
+        #loading-overlay {
+            font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: none; border: none; color: var(--apple-blue); font-size: 14px; margin-top: 10px; cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Elektri börsihind</h2>
     
-    <div id="loading" style="text-align: center; padding: 20px;">Ühendan serveriga...</div>
-    <div id="error-message"></div>
-
-    <div id="main-content" style="display: none;">
-        <div id="status-card" class="status-box bg-normal">
-            <div class="price-large"><span id="current-price-display">--</span> <span class="unit-large">s/kWh</span></div>
-            <p class="trend-text" id="trend-text"></p>
-            <p style="margin: 5px 0 0 0; font-size: 0.9em; opacity: 0.9;">(Hind koos KM 22%)</p>
-        </div>
-
-         <div class="calculator-section">
-            <h3 class="calc-title">⚡ Kalkulaator</h3>
-            <div class="calc-input-group">
-                <label for="wattsInput">Võimsus:</label>
-                <input type="number" id="wattsInput" placeholder="W" min="0" step="10">
-                <span>Vatti (W)</span>
+    <div class="card" id="main-card">
+        <h2>Hetkel</h2>
+        <div id="loading-overlay">Andmete laadimine...</div>
+        
+        <div id="price-content" style="display:none;">
+            <div class="price-display">
+                <span class="big-price" id="current-price">--</span>
+                <span class="unit">senti / kWh (koos KM)</span>
+                <div id="status-badge" class="status-badge" style="background: var(--apple-blue);">Laen...</div>
             </div>
-            <div id="calc-output">Sisesta võimsus (nt 2000W), et näha kulu.</div>
-            <p class="small-info">Arvutus põhineb hetkehinnal.</p>
         </div>
+    </div>
 
-        <h3>Tänased ja homsed hinnad</h3>
-        <div class="chart-container">
+    <div class="card">
+        <h2>Kalkulaator</h2>
+        <div class="input-row">
+            <span>Seadme võimsus (W)</span>
+            <input type="number" id="watts" value="1000" inputmode="numeric">
+        </div>
+        <div class="calc-result" id="calc-result">
+            1000W seade maksab praegu <span class="calc-highlight">--</span> senti tunnis.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Börsiülevaade (Täna & Homme)</h2>
+        <div class="chart-wrapper">
             <canvas id="priceChart"></canvas>
         </div>
+        <button class="refresh-btn" onclick="initApp()">↻ Uuenda andmeid käsitsi</button>
+    </div>
+
+    <div class="footer">
+        Made by Ranno
     </div>
 </div>
 
 <script>
     let myChart = null;
-    let currentPriceGlobal = 0;
-    const wattsInput = document.getElementById('wattsInput');
-    const calcOutput = document.getElementById('calc-output');
+    let currentPrice = 0;
 
-    wattsInput.addEventListener('input', calculateCalculatedCost);
-
-    function calculateCalculatedCost() {
-        const watts = parseFloat(wattsInput.value);
-        if (isNaN(watts) || watts <= 0) {
-            calcOutput.innerHTML = "Sisesta positiivne number.";
-            return;
+    // Automaatne uuendus, kui äpp avatakse (iOS backgroundist tulek)
+    document.addEventListener("visibilitychange", function() {
+        if (!document.hidden) {
+            console.log("Äpp avati, värskendan andmeid...");
+            initApp();
         }
-        const costPerHourCents = (watts / 1000) * currentPriceGlobal;
-        const costPerHourEuros = costPerHourCents / 100;
-        calcOutput.innerHTML = `Kulu: <span class="calc-result">${costPerHourCents.toFixed(2)} senti/tund</span> (€${costPerHourEuros.toFixed(3)}).`;
+    });
+
+    // Kalkulaatori loogika
+    const wattsInput = document.getElementById('watts');
+    wattsInput.addEventListener('input', updateCalculator);
+
+    function updateCalculator() {
+        const w = parseFloat(wattsInput.value) || 0;
+        const cost = (w / 1000) * currentPrice;
+        document.getElementById('calc-result').innerHTML = 
+            `${w}W seade maksab praegu <span class="calc-highlight">${cost.toFixed(2)}</span> senti tunnis.`;
     }
 
-    async function getDataAndUpdateUI() {
-        const loading = document.getElementById('loading');
-        const errorMsg = document.getElementById('error-message');
+    // PEAMINE FUNKTSIOON
+    async function initApp() {
+        const loading = document.getElementById('loading-overlay');
+        const content = document.getElementById('price-content');
+        
+        loading.style.display = 'block';
+        loading.innerText = "Uuendan andmeid...";
         
         try {
+            // Arvutame kuupäevad (Täna ja Homme)
             const now = new Date();
-            // Võtame väiksema vahemiku, et päring oleks kiirem ja stabiilsem
-            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString(); 
-            const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+            const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString(); // +2 päeva, et homne kindlalt sees oleks
 
-            // OTSE PÄRINGU ASEMEL KASUTAME PROXY-T:
-            const eleringUrl = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
-            // Kasutame 'allorigins' proxy teenust, et vältida CORS viga
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(eleringUrl)}`;
+            let eeData = [];
 
-            const response = await fetch(proxyUrl);
+            // 1. Proovime OTSE Eleringist (kõige kiirem ja stabiilsem)
+            try {
+                const url = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error("Otseühendus ebaõnnestus");
+                const json = await resp.json();
+                eeData = json.data.ee;
+            } catch (directError) {
+                console.warn("Otseühendus ebaõnnestus, proovin Proxy't...", directError);
+                // 2. Kui otse ei saa (CORS viga), kasutame Proxy't (varuvariant)
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`)}`;
+                const resp = await fetch(proxyUrl);
+                const json = await resp.json();
+                eeData = json.data.ee;
+            }
+
+            if (!eeData || eeData.length === 0) throw new Error("Andmeid ei leitud");
+
+            processAndRender(eeData);
             
-            if (!response.ok) throw new Error("Võrgu viga andmete laadimisel");
-            
-            const json = await response.json();
-            
-            // Kontrollime, kas saime andmed kätte
-            if (!json.data || !json.data.ee) throw new Error("Elering ei tagastanud andmeid");
-
-            const data = json.data.ee;
-            processData(data);
-
             loading.style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
+            content.style.display = 'block';
 
         } catch (error) {
             console.error(error);
-            loading.innerText = "";
-            errorMsg.style.display = 'block';
-            errorMsg.innerText = "Viga: " + error.message + ". Proovi lehte värskendada.";
+            loading.innerText = "Viga ühenduses. Proovi uuesti nuppu allpool.";
         }
     }
 
-    function processData(data) {
-        const now = new Date();
+    function processAndRender(data) {
         const labels = [];
         const prices = [];
         const bgColors = [];
         const borderColors = [];
-        const borderWidths = [];
-        const currentHourTimestamp = Math.floor(Date.now() / 1000 / 3600) * 3600;
+        const now = new Date();
+        const currentHourTs = Math.floor(now.getTime() / 1000 / 3600) * 3600;
         let foundCurrent = false;
 
         data.forEach(item => {
             const date = new Date(item.timestamp * 1000);
-            const hourLabel = date.getHours().toString().padStart(2, '0') + ":00";
-            const dayLabel = date.getDate() === now.getDate() ? "" : "(Homne) ";
+            const hour = date.getHours();
             
-            labels.push(dayLabel + hourLabel);
-            const finalPrice = (item.price / 10 * 1.22);
-            prices.push(finalPrice.toFixed(2));
+            // Sildid: Näitame ainult kellaaega, päeva vahetusel lisame päeva nime
+            let label = hour + ":00";
+            if (hour === 0 && date.getDate() !== now.getDate()) {
+                label = "Homme " + label;
+            }
+            labels.push(label);
 
-            if (finalPrice < 10) bgColors.push('rgba(34, 197, 94, 0.7)');
-            else bgColors.push('rgba(59, 130, 246, 0.7)');
+            // Hind koos käibemaksuga
+            let price = (item.price / 10) * 1.22;
+            price = parseFloat(price.toFixed(2));
+            prices.push(price);
 
-            if (Math.abs(item.timestamp - currentHourTimestamp) < 100) {
-                currentPriceGlobal = parseFloat(finalPrice.toFixed(2));
-                borderColors.push('#dc3545');
-                borderWidths.push(4);
+            // Värvide määramine
+            let color = '#007AFF'; // Vaikimisi sinine
+            if (price < 10) color = '#34C759'; // Roheline
+            else if (price >= 20) color = '#FF3B30'; // Punane
+            else if (price >= 10) color = '#FF9500'; // Oranž
+
+            // Kui on praegune tund
+            if (Math.abs(item.timestamp - currentHourTs) < 600) { // väike puhver
+                currentPrice = price;
                 foundCurrent = true;
+                bgColors.push(color); // Tugev värv
+                borderColors.push('#000000'); // Must ääris aktiivsel
             } else {
+                bgColors.push(color); // Sama värv
                 borderColors.push('transparent');
-                borderWidths.push(0);
             }
         });
 
-        // Kui hetke hinda ei leitud (nt kell on imelik), võtame viimase
-        if (!foundCurrent && prices.length > 0) {
-             currentPriceGlobal = parseFloat(prices[prices.length-1]);
+        // Kui miskipärast hetkeaega ei leitud (nt kell on valesti), võtame viimase
+        if (!foundCurrent && prices.length > 0) currentPrice = prices[prices.length - 1];
+
+        // Uuenda UI numbreid
+        document.getElementById('current-price').innerText = currentPrice.toFixed(2);
+        document.getElementById('current-price').style.color = 
+            currentPrice < 10 ? 'var(--apple-green)' : 
+            (currentPrice < 20 ? 'var(--apple-orange)' : 'var(--apple-red)');
+        
+        const badge = document.getElementById('status-badge');
+        if (currentPrice < 10) {
+            badge.style.background = 'var(--apple-green)';
+            badge.innerText = "Soodne aeg ✅";
+        } else if (currentPrice < 20) {
+            badge.style.background = 'var(--apple-orange)';
+            badge.innerText = "Tavaline hind ⚖️";
+        } else {
+            badge.style.background = 'var(--apple-red)';
+            badge.innerText = "Kallis! ⛔";
         }
 
-        updateStatusCard(currentPriceGlobal);
-        drawChart(labels, prices, bgColors, borderColors, borderWidths);
-        if (wattsInput.value) calculateCalculatedCost();
+        updateCalculator();
+        renderChart(labels, prices, bgColors, borderColors);
     }
 
-    function updateStatusCard(price) {
-        document.getElementById('current-price-display').innerText = price.toFixed(2);
-        const card = document.getElementById('status-card');
-        const trend = document.getElementById('trend-text');
-
-        card.className = 'status-box';
-        if (price < 10) { card.classList.add('bg-cheap'); trend.innerText = "Hind on soodne! ✅"; }
-        else if (price < 25) { card.classList.add('bg-normal'); trend.innerText = "Hind on keskmine. ⚖️"; }
-        else { card.classList.add('bg-expensive'); trend.innerText = "Hind on kallis! ❌"; }
-    }
-
-    function drawChart(labels, data, bgColors, borderColors, borderWidths) {
+    function renderChart(labels, data, bgColors, borderColors) {
         const ctx = document.getElementById('priceChart').getContext('2d');
         if (myChart) myChart.destroy();
+
+        // Aktiivse tunni leidmine, et graafik sinna kerida või esile tõsta
+        // (Chart.js vaikimisi mahutab kõik, piirame tihedust)
 
         myChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Hind (s/kWh)',
                     data: data,
                     backgroundColor: bgColors,
                     borderColor: borderColors,
-                    borderWidth: borderWidths,
-                    borderRadius: 4,
-                    barPercentage: 0.9,
+                    borderWidth: (ctx) => {
+                        // Ainult aktiivsel tunnil on ääris
+                        return ctx.raw === currentPrice ? 2 : 0; 
+                    },
+                    borderRadius: 6, // Apple stiilis ümarad tulbad
+                    barPercentage: 0.7, // Tulba paksus
+                    categoryPercentage: 0.8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                animation: false, // Eemaldame animatsiooni, et tunduks kiirem
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#000',
+                        bodyColor: '#000',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' s/kWh';
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#e9ecef' } },
-                    x: { grid: { display: false }, ticks: { maxRotation: 45, autoSkip: true, maxTicksLimit: 20 } }
+                    x: {
+                        grid: { display: false }, // Peidame vertikaalsed jooned
+                        ticks: {
+                            color: '#8E8E93',
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8 // Näitab u iga 3-4 tunni tagant kellaaega, et pilt oleks puhas
+                        }
+                    },
+                    y: {
+                        grid: { color: '#E5E5EA', borderDash: [5, 5] }, // Katkendlik joon
+                        ticks: { color: '#8E8E93' },
+                        beginAtZero: true
+                    }
                 }
             }
         });
     }
 
-    getDataAndUpdateUI();
+    // Käivita kohe
+    initApp();
+
 </script>
 </body>
 </html>
