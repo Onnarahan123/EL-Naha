@@ -40,7 +40,7 @@
             padding-bottom: 50px;
         }
 
-        /* UUS: ÄPISISENE TEAVITUS (ALERT) */
+        /* UUS: HOIATUSRIBA */
         #alert-banner {
             display: none;
             width: 100%;
@@ -142,7 +142,8 @@
             <div class="current-price-section">
                 <span class="time-range-badge" id="current-time-range">--:--</span>
                 <span class="big-price" id="current-price">--</span>
-                <span class="unit">senti / kWh (koos KM 24%)</span> </div>
+                <span class="unit">senti / kWh (KM 24%)</span>
+            </div>
             <div class="stats-row">
                 <div class="stat-item">
                     <span class="stat-label">Min</span>
@@ -206,7 +207,7 @@
     let currentPrice = 0;
     let fullData = [];
     let viewState = 'today'; 
-    const KM_MULTIPLIER = 1.24; // UUS KÄIBEMAKS 24%
+    const KM_MULTIPLIER = 1.24; // Käibemaks 24%
 
     document.addEventListener("visibilitychange", function() {
         if (!document.hidden) initApp();
@@ -245,7 +246,6 @@
         const alertBanner = document.getElementById('alert-banner');
         
         alertBanner.style.display = 'none';
-        
         getWeather(); 
         
         try {
@@ -273,7 +273,6 @@
             // --- HETKEHIND ---
             const currentTs = Math.floor(Date.now() / 1000 / 3600) * 3600;
             const currentItem = fullData.find(d => Math.abs(d.timestamp - currentTs) < 600) || fullData[fullData.length-1];
-            // KASUTAME UUT MÄÄRA (1.24)
             currentPrice = parseFloat(((currentItem.price / 10) * KM_MULTIPLIER).toFixed(2));
 
             const dateObj = new Date(currentItem.timestamp * 1000);
@@ -307,7 +306,7 @@
             // --- PÄEVA STATISTIKA ---
             const todayDate = new Date().getDate();
             const todayItems = fullData.filter(d => new Date(d.timestamp * 1000).getDate() === todayDate);
-            const todayPrices = todayItems.map(d => (d.price / 10) * KM_MULTIPLIER); // UUS MÄÄR
+            const todayPrices = todayItems.map(d => (d.price / 10) * KM_MULTIPLIER);
 
             if (todayPrices.length > 0) {
                 const min = Math.min(...todayPrices);
@@ -317,18 +316,16 @@
                 document.getElementById('day-max').innerText = max.toFixed(2);
                 document.getElementById('day-avg').innerText = avg.toFixed(2);
                 
-                // Leia odavaim tuleviku tund
                 const currentHourVal = new Date().getHours();
                 const futureItems = todayItems.filter(d => new Date(d.timestamp * 1000).getHours() >= currentHourVal);
                 if (futureItems.length > 0) {
                     futureItems.sort((a, b) => a.price - b.price);
                     const bestItem = futureItems[0];
-                    const bestPrice = ((bestItem.price / 10) * KM_MULTIPLIER).toFixed(2); // UUS MÄÄR
+                    const bestPrice = ((bestItem.price / 10) * KM_MULTIPLIER).toFixed(2);
                     const bestTime = new Date(bestItem.timestamp * 1000).getHours();
                     
                     const recBox = document.getElementById('recommendation');
                     recBox.style.display = 'block';
-                    
                     if (bestTime === currentHourVal) {
                         recBox.innerHTML = `🌟 Praegu ongi parim aeg tarbimiseks!`;
                     } else {
@@ -337,7 +334,6 @@
                 }
             }
 
-            // Kontrolli homset
             const tomorrowDate = new Date();
             tomorrowDate.setDate(tomorrowDate.getDate() + 1);
             const hasTomorrow = fullData.some(d => new Date(d.timestamp*1000).getDate() === tomorrowDate.getDate());
@@ -364,41 +360,25 @@
 
     async function getWeather() {
         try {
-            const lat = 57.848; const lon = 27.014; // Võru
+            const lat = 57.848; const lon = 27.014;
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto&forecast_days=3`;
             const resp = await fetch(url);
             const data = await resp.json();
             const daily = data.daily;
             const daysMap = ["Täna", "Homme", "Ülehomme"];
             let html = "";
-
             for(let i=0; i<3; i++) {
                 const code = daily.weather_code[i];
                 const maxT = Math.round(daily.temperature_2m_max[i]);
                 const minT = Math.round(daily.temperature_2m_min[i]);
                 const wind = Math.round(daily.wind_speed_10m_max[i] / 3.6); 
                 let icon = "☁️";
-                if (code === 0) icon = "☀️";
-                else if (code >= 1 && code <= 3) icon = "⛅";
-                else if (code >= 45 && code <= 48) icon = "🌫️";
-                else if (code >= 51 && code <= 67) icon = "🌧️";
-                else if (code >= 71 && code <= 77) icon = "❄️";
-                else if (code >= 95) icon = "⛈️";
-
-                html += `
-                    <div class="weather-day">
-                        <span class="w-title">${daysMap[i]}</span>
-                        <span class="w-icon">${icon}</span>
-                        <span class="w-temp">${minT}°..${maxT}°</span>
-                        <span class="w-wind">💨 ${wind} m/s</span>
-                    </div>
-                `;
+                if (code === 0) icon = "☀️"; else if (code <= 3) icon = "⛅"; else if (code <= 48) icon = "🌫️"; else if (code <= 67) icon = "🌧️"; else if (code <= 77) icon = "❄️"; else icon = "⛈️";
+                html += `<div class="weather-day"><span class="w-title">${daysMap[i]}</span><span class="w-icon">${icon}</span><span class="w-temp">${minT}°..${maxT}°</span><span class="w-wind">💨 ${wind} m/s</span></div>`;
                 if (i < 2) html += `<div class="w-divider"></div>`;
             }
             document.getElementById('weather-container').innerHTML = html;
-        } catch (e) {
-            console.error("Ilma viga:", e);
-        }
+        } catch (e) { console.error("Ilma viga:", e); }
     }
 
     function renderChart() {
@@ -409,39 +389,93 @@
         if (viewState === 'tomorrow') targetDate.setDate(targetDate.getDate() + 1);
 
         const filteredData = fullData.filter(d => new Date(d.timestamp * 1000).getDate() === targetDate.getDate());
-        const labels = []; const dataPoints = []; const bgColors = []; const pointData = [];
+        const labels = []; const dataPoints = [];
         const currentHour = now.getHours();
 
         filteredData.forEach(item => {
             const date = new Date(item.timestamp * 1000);
-            const hour = date.getHours();
-            labels.push(hour);
-            // KASUTAME UUT MÄÄRA (1.24)
-            let price = parseFloat(((item.price / 10) * KM_MULTIPLIER).toFixed(2));
-            dataPoints.push(price);
-            let color = '#007AFF';
-            if (price < 10) color = '#34C759';
-            else if (price >= 20) color = '#FF3B30';
-            else if (price >= 10) color = '#FF9500';
-            bgColors.push(color);
-            if (viewState === 'today' && hour === currentHour) pointData.push(price);
-            else pointData.push(null);
+            labels.push(date.getHours());
+            dataPoints.push(parseFloat(((item.price / 10) * KM_MULTIPLIER).toFixed(2)));
         });
 
         if (myChart) myChart.destroy();
+
+        // Loome gradiendi joone aluse ala jaoks
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(0, 122, 255, 0.5)'); // Sinine üleval
+        gradient.addColorStop(1, 'rgba(0, 122, 255, 0.0)'); // Läbipaistev all
+
         myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line', // Muudetud: Bar -> Line
             data: {
                 labels: labels,
-                datasets: [
-                    { label: 'Hind', data: dataPoints, backgroundColor: bgColors, borderRadius: 4, barPercentage: 0.5, categoryPercentage: 1.0, order: 2 },
-                    { type: 'line', label: 'Hetkel', data: pointData, borderColor: '#FF3B30', backgroundColor: '#FF3B30', pointRadius: 6, borderWidth: 0, showLine: false, order: 1 }
-                ]
+                datasets: [{
+                    label: 'Hind',
+                    data: dataPoints,
+                    borderColor: (context) => {
+                        // Dünaamiline joone värv
+                        const val = context.raw;
+                        if (val < 10) return '#34C759'; // Roheline
+                        if (val > 20) return '#FF3B30'; // Punane
+                        return '#007AFF'; // Sinine
+                    },
+                    segment: {
+                        borderColor: ctx => {
+                            // Sujuv värvimuutus joone segmentidel
+                            if (ctx.p0.parsed.y < 10 && ctx.p1.parsed.y < 10) return '#34C759';
+                            if (ctx.p0.parsed.y > 20 || ctx.p1.parsed.y > 20) return '#FF3B30';
+                            return '#007AFF';
+                        }
+                    },
+                    backgroundColor: gradient, // Hajuv taust
+                    fill: true,
+                    tension: 0.4, // Sujuvad kurvid (smooth)
+                    pointRadius: (ctx) => {
+                        // Näita punkti ainult praeguse tunni kohal
+                        if(viewState === 'today' && ctx.dataIndex === currentHour) return 6;
+                        return 0; // Peida teised punktid puhtama vaate jaoks
+                    },
+                    pointBackgroundColor: '#FF3B30',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    borderWidth: 3
+                }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, animation: { duration: 500 },
-                plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#000', bodyColor: '#000', borderColor: '#ddd', borderWidth: 1, padding: 10, displayColors: false, callbacks: { title: (ctx) => `Kell ${ctx[0].label}:00 – ${parseInt(ctx[0].label)+1}:00`, label: (ctx) => `${ctx.raw} s/kWh` } } },
-                scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: '#8E8E93' } }, y: { title: { display: true, text: 's / kWh', color: '#8E8E93', font: { size: 10, weight: 'bold' } }, beginAtZero: true, grid: { color: '#E5E5EA', borderDash: [5, 5] }, ticks: { color: '#8E8E93' } } }
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index', // "Slider" efekt - näitab infot, kui lohistad üle graafiku
+                    intersect: false,
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#000',
+                        bodyColor: '#000',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: (ctx) => `Kell ${ctx[0].label}:00 – ${parseInt(ctx[0].label)+1}:00`,
+                            label: (ctx) => `${ctx.raw} s/kWh`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxTicksLimit: 8, color: '#8E8E93' }
+                    },
+                    y: {
+                        title: { display: true, text: 's / kWh', color: '#8E8E93', font: { size: 10, weight: 'bold' } },
+                        beginAtZero: true,
+                        grid: { color: '#E5E5EA', borderDash: [5, 5] },
+                        ticks: { color: '#8E8E93' }
+                    }
+                }
             }
         });
     }
