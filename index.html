@@ -3,433 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nutikas Elektrihind</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/lightning-bolt.png">
-    <title>Elektrihind</title>
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/wind-turbine.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
     <style>
-        /* APPLE STYLE & CLEAN DESIGN */
         :root {
-            --bg-grad-start: #f5f5f7;
-            --bg-grad-end: #ffffff;
+            --primary-green: #4CAF50;
+            --dark-green: #2E7D32;
+            --bg-color: #f4f6f8;
             --card-bg: #ffffff;
-            --text-primary: #1c1c1e;
-            --text-secondary: #8e8e93;
-            --enefit-green: #4caf50; /* Enefitile sarnane roheline */
-            --highlight-green: rgba(76, 175, 80, 0.2);
+            --text-main: #1a1a1a;
+            --text-muted: #757575;
+            --danger: #e53935;
+            --warning: #fb8c00;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(180deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            padding-bottom: 50px;
-        }
+        .container { width: 100%; max-width: 500px; padding-bottom: 60px; }
 
         /* KAARDID */
         .card {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .card-mini {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 18px;
+            padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        h2 { font-size: 13px; font-weight: 700; margin: 0 0 15px 0; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+        h2 { font-size: 14px; text-transform: uppercase; color: var(--text-muted); margin: 0 0 10px 0; letter-spacing: 0.5px; }
 
-        /* HETKEHIND (Enefit stiilis suur roheline number) */
-        .current-price-section { text-align: center; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; margin-bottom: 15px; }
-        .price-label { font-size: 16px; color: var(--text-primary); font-weight: 500; margin-bottom: 5px; }
-        .big-price { font-size: 64px; font-weight: 700; letter-spacing: -2px; line-height: 1; display: block; color: var(--enefit-green); }
-        .unit { font-size: 18px; font-weight: 600; color: var(--enefit-green); margin-top: 5px; display: block; }
-        .tax-note { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
+        /* HETKEHIND */
+        .hero-section { text-align: center; }
+        .hero-price { font-size: 64px; font-weight: 800; color: var(--primary-green); line-height: 1; }
+        .hero-unit { font-size: 18px; color: var(--text-muted); font-weight: 500; }
+        .hero-time { font-size: 14px; background: #e8f5e9; color: var(--dark-green); padding: 4px 12px; border-radius: 12px; display: inline-block; margin-bottom: 10px; font-weight: 600; }
 
-        /* STATISTIKA */
-        .stats-row { display: flex; justify-content: space-between; padding: 0 10px; }
-        .stat-item { text-align: center; flex: 1; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px; display: block; }
-        .stat-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-
-        /* ILM */
-        .weather-row { display: flex; justify-content: space-between; align-items: flex-start; }
-        .weather-day { text-align: center; flex: 1; padding: 0 4px; }
-        .w-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
-        .w-icon { font-size: 24px; display: block; margin: 4px 0; }
-        .w-temp { font-size: 13px; font-weight: 700; display: block; }
-        .w-wind { font-size: 11px; color: var(--text-secondary); margin-top: 2px; display: block; }
-        .w-divider { width: 1px; background: #eee; height: 50px; margin: 10px 0; }
+        /* VÕRDLUS (TÄNA VS HOMME) */
+        .comparison-grid { display: flex; gap: 10px; margin-top: 10px; }
+        .comp-box { flex: 1; background: #fafafa; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #eee; }
+        .comp-val { font-size: 20px; font-weight: 700; display: block; }
+        .comp-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+        .diff-badge { font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 5px; display: inline-block; }
+        .diff-up { background: #ffebee; color: var(--danger); }
+        .diff-down { background: #e8f5e9; color: var(--dark-green); }
 
         /* GRAAFIK */
-        .segmented-control { display: flex; background: #f0f0f5; padding: 3px; border-radius: 10px; margin-bottom: 20px; }
-        .segment-btn { flex: 1; border: none; padding: 8px 0; border-radius: 8px; font-size: 13px; font-weight: 600; background: transparent; color: #666; cursor: pointer; transition: all 0.2s ease; }
-        .segment-btn.active { background: #FFFFFF; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .chart-wrapper { position: relative; height: 320px; width: 100%; }
-
-        /* TEADE (ANDMED PUUDUVAD) */
-        #no-data-msg {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            text-align: center;
-            background: rgba(255,255,255,0.9);
-            padding: 20px;
-            border-radius: 15px;
-        }
-        .no-data-icon { font-size: 40px; margin-bottom: 10px; display: block; }
-        .no-data-text { font-size: 16px; font-weight: 600; color: #333; }
-        .no-data-sub { font-size: 14px; color: #888; margin-top: 5px; line-height: 1.4; }
-
-        /* KALKULAATOR */
-        .presets-grid { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
-        .preset-btn { background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; padding: 10px; font-size: 20px; cursor: pointer; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .preset-btn:active { background: #eee; }
-        .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 500; }
-        .calc-input { border: 1px solid #ddd; background: #fff; padding: 8px; border-radius: 8px; font-size: 16px; font-weight: 600; width: 80px; text-align: center; outline: none; color: #333; }
-
-        .footer { text-align: center; font-size: 11px; color: #bbb; margin-top: 30px; }
-        #loading-overlay { font-size: 14px; color: #888; text-align: center; margin: 20px 0; }
+        .chart-container { position: relative; height: 320px; width: 100%; }
         
-        /* HOIATUSRIBA */
-        #alert-banner { display: none; width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center; }
+        /* TOP 3 LISTID */
+        .hours-grid { display: flex; gap: 15px; }
+        .hours-col { flex: 1; }
+        .hours-list { list-style: none; padding: 0; margin: 0; }
+        .hours-list li { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+        .hours-list li:last-child { border-bottom: none; }
+        .h-time { color: var(--text-muted); }
+        .h-price { font-weight: 600; }
+        .col-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; display: block; }
+        .good { color: var(--dark-green); }
+        .bad { color: var(--danger); }
+
+        /* ILM JA INFO */
+        .context-row { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-bottom: 8px; }
+        .context-icon { font-size: 20px; width: 30px; text-align: center; }
+        
+        /* SEADED / TEAVITUSED */
+        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .toggle-btn { background: #eee; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .toggle-btn.active { background: var(--primary-green); color: white; }
+
+        /* Footer */
+        .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <div id="alert-banner"></div>
 
-    <div class="card" id="main-card">
-        <div id="loading-overlay">Laen andmeid...</div>
+    <div class="card hero-section">
+        <div id="current-time" class="hero-time">--:--</div>
+        <div id="current-price" class="hero-price">--</div>
+        <div class="hero-unit">senti / kWh (KM 24%)</div>
         
-        <div id="price-content" style="display:none;">
-            <div class="current-price-section">
-                <div class="price-label">Elektri börsihind hetkel</div>
-                <span class="big-price" id="current-price">--</span>
-                <span class="unit">senti / kWh</span>
-                <div class="tax-note">Hind koos käibemaksuga (24%)</div>
+        <div class="comparison-grid">
+            <div class="comp-box">
+                <span class="comp-label">Täna keskmine</span>
+                <span id="avg-today" class="comp-val">--</span>
             </div>
-            <div class="stats-row">
-                <div class="stat-item">
-                    <span class="stat-label">Min</span>
-                    <span class="stat-value" id="day-min">--</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Keskmine</span>
-                    <span class="stat-value" id="day-avg">--</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Max</span>
-                    <span class="stat-value" id="day-max">--</span>
-                </div>
+            <div class="comp-box">
+                <span class="comp-label">Homme keskmine</span>
+                <span id="avg-tomorrow" class="comp-val">--</span>
+                <span id="diff-badge" class="diff-badge" style="display:none;">--%</span>
             </div>
-        </div>
-    </div>
-
-    <div class="card-mini">
-        <h2 style="margin-bottom:12px; margin-top:5px; text-align:left;">Ilm (Võru)</h2>
-        <div class="weather-row" id="weather-container">
-            <div style="width:100%; text-align:center; color:#888; font-size:13px;">Laen ilmainfot...</div>
         </div>
     </div>
 
     <div class="card">
-        <div class="segmented-control">
-            <button class="segment-btn active" id="btn-today" onclick="switchView('today')">Täna</button>
-            <button class="segment-btn" id="btn-tomorrow" onclick="switchView('tomorrow')">Homme</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h2>Hinnagraafik</h2>
+            <select id="day-select" onchange="renderChart()" style="border:none; bg:transparent; font-weight:600; color:#4CAF50;">
+                <option value="today">Täna</option>
+                <option value="tomorrow">Homme</option>
+            </select>
         </div>
-        
-        <div class="chart-wrapper">
+        <div class="chart-container">
             <canvas id="priceChart"></canvas>
-            
-            <div id="no-data-msg">
-                <span class="no-data-icon">⏳</span>
-                <div class="no-data-text">Andmed puuduvad</div>
-                <div class="no-data-sub">Nord Pooli homsed hinnad avalikustatakse<br>tavaliselt kell <b>14:00</b>.</div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top:10px;">
-            <button onclick="initApp()" style="background:none; border:none; color:#4caf50; font-size:12px; font-weight:600;">↻ Värskenda</button>
         </div>
     </div>
 
-    <div class="card-mini">
-        <h2 style="text-align:left; margin-bottom:10px;">Kalkulaator</h2>
-        <div class="presets-grid">
-            <button class="preset-btn" onclick="setWatts(10, 'LED Lamp')">💡</button>
-            <button class="preset-btn" onclick="setWatts(2000, 'Pesumasin')">🧺</button>
-            <button class="preset-btn" onclick="setWatts(6000, 'Saun')">🧖‍♂️</button>
-            <button class="preset-btn" onclick="setWatts(11000, 'Auto')">🚗</button>
-        </div>
-        <div class="calc-row">
-            <span id="device-name">Võimsus:</span>
-            <div>
-                <input type="number" id="watts" value="2000" class="calc-input"> <span style="font-size:14px; color:#666;">W</span>
+    <div class="card">
+        <h2>Parimad ja Halvimad ajad</h2>
+        <div class="hours-grid">
+            <div class="hours-col">
+                <span class="col-title good">🟢 Soodsamad 3h</span>
+                <ul class="hours-list" id="list-cheap">Loading...</ul>
+            </div>
+            <div class="hours-col">
+                <span class="col-title bad">🔴 Kalleimad 3h</span>
+                <ul class="hours-list" id="list-expensive">Loading...</ul>
             </div>
         </div>
-        <div style="font-size: 15px; font-weight:600; color: var(--text-primary); margin-top: 15px; text-align: right; border-top:1px solid #eee; padding-top:10px;" id="calc-result">...</div>
     </div>
 
-    <div class="footer">Made by Ranno</div>
+    <div class="card">
+        <h2>Ilm ja Seosed</h2>
+        <div id="weather-context">
+            Laen andmeid...
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Teavitused</h2>
+        <p style="font-size:13px; color:#666; margin:0;">Saada teade, kui hind on alla 5 sendi või kui homme on kallis.</p>
+        <div class="settings-row">
+            <span style="font-size:14px; font-weight:600;">Luba teavitused</span>
+            <button id="btn-notify" class="toggle-btn" onclick="toggleNotifications()">Luba</button>
+        </div>
+    </div>
+
+    <div class="footer">Made by Ranno • Andmed: Elering & Open-Meteo</div>
+
 </div>
 
 <script>
-    let myChart = null;
-    let currentPrice = 0;
-    let fullData = [];
-    let viewState = 'today'; 
-    const KM_MULTIPLIER = 1.24; // 24% KM
+    // --- KONFIGURATSIOON ---
+    const KM = 1.24; // 24% Käibemaks
+    const NOTIFY_THRESH_LOW = 5.0; // Alla selle hinna saada teade
+    let electricityData = { today: [], tomorrow: [] };
+    let weatherData = {};
+    let chartInstance = null;
+    let notificationsEnabled = false;
 
-    document.addEventListener("visibilitychange", function() {
-        if (!document.hidden) initApp();
+    // --- ALUSTUS ---
+    document.addEventListener("DOMContentLoaded", () => {
+        initApp();
+        // Kontrolli, kas teavitused on juba lubatud
+        if (Notification.permission === "granted") {
+            notificationsEnabled = true;
+            updateNotifyButton();
+        }
     });
 
-    const wattsInput = document.getElementById('watts');
-    wattsInput.addEventListener('input', () => updateCalculator());
-
-    function setWatts(val, name) {
-        wattsInput.value = val;
-        document.getElementById('device-name').innerText = name + ":";
-        updateCalculator();
-    }
-
-    function updateCalculator() {
-        const w = parseFloat(wattsInput.value) || 0;
-        const costCents = (w / 1000) * currentPrice;
-        let text = `Kulu hetkel: ${costCents.toFixed(2)} senti / tund`;
-        if (w > 3000) {
-            const costEur = costCents / 100;
-            text += ` <br><span style="color:#888; font-size:13px;">(€${costEur.toFixed(2)} / tund)</span>`;
-        }
-        document.getElementById('calc-result').innerHTML = text;
-    }
-
-    function switchView(view) {
-        viewState = view;
-        document.getElementById('btn-today').className = view === 'today' ? 'segment-btn active' : 'segment-btn';
-        document.getElementById('btn-tomorrow').className = view === 'tomorrow' ? 'segment-btn active' : 'segment-btn';
-        
-        // Kontrollime andmete olemasolu
-        const targetDate = new Date();
-        if (viewState === 'tomorrow') targetDate.setDate(targetDate.getDate() + 1);
-        
-        // Filtreeri andmed kuupäeva järgi, et kontrollida kas on midagi näidata
-        const hasData = fullData.some(d => new Date(d.timestamp * 1000).getDate() === targetDate.getDate());
-        
-        const chartCanvas = document.getElementById('priceChart');
-        const msgDiv = document.getElementById('no-data-msg');
-
-        if (hasData) {
-            chartCanvas.style.display = 'block';
-            msgDiv.style.display = 'none';
-            renderChart();
-        } else {
-            chartCanvas.style.display = 'none';
-            msgDiv.style.display = 'block';
-        }
-    }
-
     async function initApp() {
-        const loading = document.getElementById('loading-overlay');
-        const content = document.getElementById('price-content');
-        const alertBanner = document.getElementById('alert-banner');
+        await Promise.all([fetchElectricity(), fetchWeather()]);
+        processData();
+        renderChart();
+        updateUI();
+        checkNotifications(); // Kontrolli, kas on vaja teavitada
+    }
+
+    // --- 1. ANDMETE PÄRIMINE ---
+    async function fetchElectricity() {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
         
-        alertBanner.style.display = 'none';
-        getWeather(); 
+        // Kasutame proxyt CORS vältimiseks
+        const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`)}`;
         
         try {
-            const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-            const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
+            const resp = await fetch(url);
+            const json = await resp.json();
+            const data = json.data.ee;
 
-            let eeData = [];
-            try {
-                // Elering API
-                const resp = await fetch(`https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`);
-                if (!resp.ok) throw new Error();
-                const json = await resp.json();
-                eeData = json.data.ee;
-            } catch (e) {
-                // Proxy
-                console.log("Kasutan proxyt...");
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`)}`;
-                const resp = await fetch(proxyUrl);
-                const json = await resp.json();
-                eeData = json.data.ee;
-            }
+            // Jagame andmed tänaseks ja homseks
+            const todayStr = new Date().toDateString();
+            const tomorrowStr = new Date(new Date().setDate(new Date().getDate() + 1)).toDateString();
 
-            if (!eeData || eeData.length === 0) throw new Error("Andmeid pole");
-            fullData = eeData;
-
-            // --- HETKEHIND ---
-            const currentTs = Math.floor(Date.now() / 1000 / 3600) * 3600;
-            const currentItem = fullData.find(d => Math.abs(d.timestamp - currentTs) < 600) || fullData[fullData.length-1];
-            currentPrice = parseFloat(((currentItem.price / 10) * KM_MULTIPLIER).toFixed(2));
-
-            // Värvi suur hind roheliseks kui odav, punaseks kui kallis
-            const priceEl = document.getElementById('current-price');
-            priceEl.innerText = currentPrice.toFixed(2).replace('.', ',');
-            
-            // Hoiatusriba
-            if (currentPrice > 25) {
-                alertBanner.style.display = 'block';
-                alertBanner.style.background = '#ffebee';
-                alertBanner.style.color = '#c62828';
-                alertBanner.innerText = "Hind on hetkel kõrge!";
-            } else if (currentPrice < 5) {
-                alertBanner.style.display = 'block';
-                alertBanner.style.background = '#e8f5e9';
-                alertBanner.style.color = '#2e7d32';
-                alertBanner.innerText = "Hind on väga soodne!";
-            }
-
-            // --- STATISTIKA ---
-            const todayDate = new Date().getDate();
-            const todayItems = fullData.filter(d => new Date(d.timestamp * 1000).getDate() === todayDate);
-            const todayPrices = todayItems.map(d => (d.price / 10) * KM_MULTIPLIER);
-
-            if (todayPrices.length > 0) {
-                const min = Math.min(...todayPrices);
-                const max = Math.max(...todayPrices);
-                const avg = todayPrices.reduce((a, b) => a + b, 0) / todayPrices.length;
-                document.getElementById('day-min').innerText = min.toFixed(2);
-                document.getElementById('day-max').innerText = max.toFixed(2);
-                document.getElementById('day-avg').innerText = avg.toFixed(2);
-            }
-
-            // Homsed nupud
-            const tomorrowDate = new Date();
-            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-            const hasTomorrow = fullData.some(d => new Date(d.timestamp*1000).getDate() === tomorrowDate.getDate());
-            
-            loading.style.display = 'none';
-            content.style.display = 'block';
-            updateCalculator();
-            switchView('today');
-
-        } catch (error) {
-            console.error(error);
-            loading.innerText = "Viga andmetes.";
+            electricityData.today = data.filter(d => new Date(d.timestamp * 1000).toDateString() === todayStr);
+            electricityData.tomorrow = data.filter(d => new Date(d.timestamp * 1000).toDateString() === tomorrowStr);
+        } catch (e) {
+            console.error("Elekter fail:", e);
         }
     }
 
-    async function getWeather() {
+    async function fetchWeather() {
+        // Võru koordinaadid
+        const lat = 57.848; const lon = 27.014;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m&daily=temperature_2m_min,wind_speed_10m_max&timezone=auto`;
+
         try {
-            const lat = 57.848; const lon = 27.014;
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto&forecast_days=3`;
             const resp = await fetch(url);
-            const data = await resp.json();
-            const daily = data.daily;
-            const daysMap = ["Täna", "Homme", "Ülehomme"];
-            let html = "";
-            for(let i=0; i<3; i++) {
-                const code = daily.weather_code[i];
-                const maxT = Math.round(daily.temperature_2m_max[i]);
-                const minT = Math.round(daily.temperature_2m_min[i]);
-                const wind = Math.round(daily.wind_speed_10m_max[i] / 3.6); 
-                let icon = "☁️";
-                if (code === 0) icon = "☀️"; else if (code <= 3) icon = "⛅"; else if (code <= 48) icon = "🌫️"; else if (code <= 67) icon = "🌧️"; else if (code <= 77) icon = "❄️"; else icon = "⛈️";
-                html += `<div class="weather-day"><span class="w-title">${daysMap[i]}</span><span class="w-icon">${icon}</span><span class="w-temp">${minT}°..${maxT}°</span><span class="w-wind">💨 ${wind} m/s</span></div>`;
-                if (i < 2) html += `<div class="w-divider"></div>`;
-            }
-            document.getElementById('weather-container').innerHTML = html;
-        } catch (e) { console.error("Ilma viga:", e); }
+            weatherData = await resp.json();
+        } catch (e) { console.error("Ilm fail:", e); }
     }
 
+    // --- 2. UI UUENDAMINE ---
+    function updateUI() {
+        // Hetkehind
+        const currentTs = Math.floor(Date.now() / 1000 / 3600) * 3600;
+        const currentItem = electricityData.today.find(d => d.timestamp === currentTs);
+        
+        if (currentItem) {
+            const price = (currentItem.price / 10 * KM).toFixed(2);
+            document.getElementById('current-price').innerText = price;
+            
+            // Kellaaeg (nt 14:00 - 15:00)
+            const date = new Date(currentItem.timestamp * 1000);
+            const h = date.getHours().toString().padStart(2,'0');
+            const hNext = (date.getHours() + 1).toString().padStart(2,'0');
+            document.getElementById('current-time').innerText = `${h}:00 – ${hNext}:00`;
+        }
+
+        // Keskmised
+        const avgToday = calculateAvg(electricityData.today);
+        document.getElementById('avg-today').innerText = avgToday;
+
+        if (electricityData.tomorrow.length > 0) {
+            const avgTom = calculateAvg(electricityData.tomorrow);
+            document.getElementById('avg-tomorrow').innerText = avgTom;
+            
+            // Erinevus %
+            const diff = ((avgTom - avgToday) / avgToday) * 100;
+            const badge = document.getElementById('diff-badge');
+            badge.style.display = 'inline-block';
+            badge.innerText = (diff > 0 ? "+" : "") + diff.toFixed(0) + "%";
+            badge.className = diff > 0 ? "diff-badge diff-up" : "diff-badge diff-down";
+        } else {
+            document.getElementById('avg-tomorrow').innerText = "-";
+            document.getElementById('avg-tomorrow').style.fontSize = "14px";
+            document.getElementById('avg-tomorrow').innerText = "Pole veel";
+        }
+
+        // Top 3 nimekirjad (kuvame valitud päeva omasid, vaikimisi täna)
+        updateTopLists(electricityData.today);
+
+        // Ilma seosed
+        updateWeatherContext();
+    }
+
+    function calculateAvg(data) {
+        if (!data.length) return 0;
+        const sum = data.reduce((acc, item) => acc + (item.price / 10 * KM), 0);
+        return (sum / data.length).toFixed(2);
+    }
+
+    function updateTopLists(data) {
+        if (!data.length) return;
+        
+        // Teeme koopia ja sordime
+        const sorted = [...data].sort((a, b) => a.price - b.price);
+        const cheapest = sorted.slice(0, 3);
+        const expensive = sorted.slice(-3).reverse();
+
+        const renderList = (items, elId) => {
+            const el = document.getElementById(elId);
+            el.innerHTML = items.map(item => {
+                const date = new Date(item.timestamp * 1000);
+                const h = date.getHours().toString().padStart(2,'0');
+                const hEnd = (date.getHours() + 1).toString().padStart(2,'0');
+                const p = (item.price / 10 * KM).toFixed(1);
+                return `<li><span class="h-time">${h}:00–${hEnd}</span> <span class="h-price">${p} s</span></li>`;
+            }).join('');
+        };
+
+        renderList(cheapest, 'list-cheap');
+        renderList(expensive, 'list-expensive');
+    }
+
+    function updateWeatherContext() {
+        if (!weatherData.current) return;
+        
+        const temp = weatherData.current.temperature_2m;
+        const wind = weatherData.current.wind_speed_10m;
+        const div = document.getElementById('weather-context');
+        
+        let html = `
+            <div class="context-row">
+                <span class="context-icon">🌡️</span>
+                <span>Temperatuur hetkel <b>${temp}°C</b>.</span>
+            </div>
+            <div class="context-row">
+                <span class="context-icon">🌬️</span>
+                <span>Tuule kiirus <b>${wind} km/h</b>.</span>
+            </div>
+        `;
+
+        // Nutikas analüüs
+        let insights = [];
+        if (wind > 20) insights.push("🌪 Tugev tuul – see surub tavaliselt hinda alla!");
+        if (temp < -10) insights.push("❄️ Väga külm – oodata on tarbimise kasvu ja kõrgemat hinda.");
+        if (temp > -5 && wind > 15) insights.push("✅ Hea tuuleenergia toodang hoiab hinna kontrolli all.");
+
+        if (insights.length > 0) {
+            html += `<div style="margin-top:10px; padding:10px; background:#e3f2fd; border-radius:8px; font-size:13px; color:#0d47a1;">${insights.join('<br>')}</div>`;
+        }
+
+        div.innerHTML = html;
+    }
+
+    // --- 3. GRAAFIK (CHART.JS) ---
     function renderChart() {
-        if (fullData.length === 0) return;
         const ctx = document.getElementById('priceChart').getContext('2d');
-        const now = new Date();
-        const targetDate = new Date();
-        if (viewState === 'tomorrow') targetDate.setDate(targetDate.getDate() + 1);
+        const selection = document.getElementById('day-select').value;
+        const dataset = selection === 'today' ? electricityData.today : electricityData.tomorrow;
 
-        const filteredData = fullData.filter(d => new Date(d.timestamp * 1000).getDate() === targetDate.getDate());
-        const labels = []; const dataPoints = [];
-        const currentHour = now.getHours();
+        if (!dataset || dataset.length === 0) {
+            // Kui andmeid pole (nt homme)
+            if (chartInstance) chartInstance.destroy();
+            return; 
+        }
 
-        // Arvuta päeva max hind, et teada kui kõrge highlight teha
-        let maxPrice = 0;
+        // Uuenda top liste ka valiku põhjal
+        updateTopLists(dataset);
 
-        filteredData.forEach(item => {
-            const date = new Date(item.timestamp * 1000);
-            labels.push(date.getHours().toString().padStart(2, '0'));
-            const p = parseFloat(((item.price / 10) * KM_MULTIPLIER).toFixed(2));
-            if(p > maxPrice) maxPrice = p;
-            dataPoints.push(p);
-        });
+        const labels = dataset.map(d => new Date(d.timestamp * 1000).getHours());
+        const prices = dataset.map(d => parseFloat((d.price / 10 * KM).toFixed(2)));
+        const dayAvg = parseFloat(calculateAvg(dataset));
 
-        // Highlight tulp (vertikaalne riba)
-        const highlightData = labels.map((label, index) => {
-            // Kui on täna ja praegune tund, siis pane väärtus (veidi kõrgem kui max, et ulatuks üles)
-            if (viewState === 'today' && parseInt(label) === currentHour) {
-                return maxPrice + 5; 
-            }
-            return null;
-        });
+        // Värviloogika (Segment)
+        const getSegmentColor = (ctx) => {
+            const p = ctx.p0.parsed.y;
+            if (p < 10) return '#4CAF50'; // Roheline
+            if (p < 25) return '#FFC107'; // Kollane
+            return '#F44336'; // Punane
+        };
 
-        if (myChart) myChart.destroy();
+        if (chartInstance) chartInstance.destroy();
 
-        myChart = new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [
-                    {
-                        // TAUSTA ESITLETÕST (TULP)
-                        type: 'bar',
-                        label: 'Praegu',
-                        data: highlightData,
-                        backgroundColor: 'rgba(76, 175, 80, 0.15)', // Õrn roheline riba
-                        barPercentage: 1.0,
-                        categoryPercentage: 1.0,
-                        borderWidth: 0,
-                        order: 2 // Joonista taha
+                datasets: [{
+                    label: 'Hind',
+                    data: prices,
+                    borderWidth: 3,
+                    stepped: true, // TEKITAB ASTMELISE JOONE
+                    fill: false,
+                    segment: {
+                        borderColor: ctx => getSegmentColor(ctx)
                     },
-                    {
-                        // HINNA JOON (ASTMELINE)
-                        type: 'line',
-                        label: 'Hind',
-                        data: dataPoints,
-                        borderColor: '#4caf50', // Enefit Roheline
-                        borderWidth: 2,
-                        stepped: true, // TEKITAB KANDILISE JOONE
-                        pointRadius: (ctx) => {
-                            // Näita täppi AINULT praeguse tunni alguses
-                            if (viewState === 'today' && ctx.dataIndex === currentHour) return 5;
-                            return 0;
-                        },
-                        pointBackgroundColor: '#4caf50',
-                        fill: false,
-                        order: 1 // Joonista ette
-                    }
-                ]
+                    pointRadius: 0, // Peida punktid vaikimisi
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#333'
+                }]
             },
             options: {
                 responsive: true,
@@ -440,17 +383,44 @@
                 },
                 plugins: {
                     legend: { display: false },
+                    annotation: {
+                        annotations: {
+                            avgLine: {
+                                type: 'line',
+                                yMin: dayAvg,
+                                yMax: dayAvg,
+                                borderColor: 'rgba(0,0,0,0.3)',
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+                                label: {
+                                    display: true,
+                                    content: `Keskmine: ${dayAvg}`,
+                                    position: 'start',
+                                    backgroundColor: 'rgba(255,255,255,0.8)',
+                                    color: '#666',
+                                    font: { size: 10 }
+                                }
+                            }
+                        }
+                    },
                     tooltip: {
-                        enabled: true,
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        backgroundColor: 'rgba(255,255,255,0.95)',
                         titleColor: '#000',
                         bodyColor: '#000',
                         borderColor: '#ddd',
                         borderWidth: 1,
+                        padding: 10,
                         callbacks: {
+                            title: (ctx) => {
+                                const h = ctx[0].label.toString().padStart(2,'0');
+                                const hNext = (parseInt(ctx[0].label) + 1).toString().padStart(2,'0');
+                                return `${h}:00 – ${hNext}:00`;
+                            },
                             label: (ctx) => {
-                                if(ctx.dataset.type === 'bar') return ''; // Ära näita tulba infot
-                                return `${ctx.raw} s/kWh`;
+                                const price = ctx.raw;
+                                const diff = ((price - dayAvg) / dayAvg * 100).toFixed(0);
+                                const sign = diff > 0 ? "+" : "";
+                                return [`Hind: ${price} s/kWh`, `Erinevus keskmisest: ${sign}${diff}%`];
                             }
                         }
                     }
@@ -459,20 +429,94 @@
                     x: {
                         grid: { display: false },
                         ticks: { 
-                            maxTicksLimit: 12, // Näita iga teist tundi (00, 02, 04...)
-                            color: '#8e8e93' 
+                            // Näita kõiki kellaaegu, kui ruumi on, või iga teist
+                            maxTicksLimit: 13, 
+                            callback: function(val, index) {
+                                // Näita 0, 2, 4... või kui ruumi on, siis 12, 13, 14
+                                return this.getLabelForValue(val);
+                            }
                         }
                     },
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#f0f0f5' },
-                        ticks: { color: '#8e8e93' }
+                        grid: { color: '#f0f0f0' }
                     }
                 }
             }
         });
     }
-    initApp();
+
+    // --- 4. TEAVITUSED (NOTIFICATIONS) ---
+    function toggleNotifications() {
+        if (!("Notification" in window)) {
+            alert("Sinu brauser ei toeta teavitusi.");
+            return;
+        }
+
+        if (Notification.permission === "granted") {
+            // Kasutaja tahab välja lülitada (lihtsustatud loogika: me ei saa luba 'tagasi võtta', aga saame lipu maha võtta)
+            notificationsEnabled = !notificationsEnabled;
+            updateNotifyButton();
+        } else {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    notificationsEnabled = true;
+                    new Notification("Teavitused lubatud!", { body: "Anname märku, kui hind on odav." });
+                    updateNotifyButton();
+                    checkNotifications();
+                }
+            });
+        }
+    }
+
+    function updateNotifyButton() {
+        const btn = document.getElementById('btn-notify');
+        if (notificationsEnabled) {
+            btn.innerText = "Lubatud ✅";
+            btn.classList.add('active');
+        } else {
+            btn.innerText = "Luba";
+            btn.classList.remove('active');
+        }
+    }
+
+    function checkNotifications() {
+        if (!notificationsEnabled) return;
+        
+        // 1. Kas praegu on odav?
+        const currentPriceEl = document.getElementById('current-price');
+        const price = parseFloat(currentPriceEl.innerText);
+        
+        // Kasutame localStorage'it, et mitte spammida iga kord kui äpp avatakse
+        const lastAlertTime = localStorage.getItem('last_cheap_alert');
+        const now = Date.now();
+
+        // Kui hind on alla piiri ja pole viimase 6h jooksul teavitanud
+        if (price < NOTIFY_THRESH_LOW && (!lastAlertTime || now - lastAlertTime > 6 * 60 * 60 * 1000)) {
+            new Notification("Super hind!", { 
+                body: `Elekter on praegu vaid ${price} s/kWh. Pane masinad tööle!`,
+                icon: "https://img.icons8.com/color/96/lightning-bolt.png"
+            });
+            localStorage.setItem('last_cheap_alert', now);
+        }
+
+        // 2. Homne hind (kui andmed olemas)
+        const avgTomEl = document.getElementById('avg-tomorrow');
+        if (avgTomEl.innerText !== "-" && avgTomEl.innerText !== "Pole veel") {
+            const avgTom = parseFloat(avgTomEl.innerText);
+            const avgToday = parseFloat(document.getElementById('avg-today').innerText);
+            const lastTomAlert = localStorage.getItem('last_tomorrow_alert');
+            
+            // Kui homme on 20% kallim kui täna
+            if (avgTom > avgToday * 1.2 && (!lastTomAlert || now - lastTomAlert > 12 * 60 * 60 * 1000)) {
+                new Notification("Hoiatus homseks", {
+                    body: `Homme on keskmine hind ${avgTom} s/kWh (kallim kui täna).`,
+                });
+                localStorage.setItem('last_tomorrow_alert', now);
+            }
+        }
+    }
 </script>
+
 </body>
 </html>
