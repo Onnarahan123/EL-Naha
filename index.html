@@ -57,7 +57,6 @@
             padding: 4px 12px; border-radius: 20px; 
             font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 5px;
         }
-        /* SIIN ON MUUDATUS: FORCE GREEN COLOR */
         .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); }
         .hero-unit { font-size: 16px; color: var(--muted); font-weight: 500; margin-top: 5px; }
 
@@ -100,6 +99,7 @@
         .notify-btn.active { background: var(--primary); color: white; }
         #loader { text-align: center; color: var(--muted); padding: 40px; }
         .hidden { display: none !important; }
+        .last-update { text-align: center; color: #ccc; font-size: 10px; margin-top: 5px; }
         
     </style>
 </head>
@@ -188,8 +188,9 @@
         <button id="btn-notify" class="notify-btn" onclick="toggleNotify()">Luba teavitused</button>
     </div>
 
-    <div style="text-align:center; color:#ccc; font-size:11px; margin-top:20px;">
-        Made by Ranno • v3.1 Green Edition
+    <div class="last-update" id="last-update-text"></div>
+    <div style="text-align:center; color:#ccc; font-size:11px; margin-top:5px; margin-bottom:20px;">
+        Made by Ranno • v3.2 Auto-Refresh
     </div>
 
 </div>
@@ -199,6 +200,7 @@
     let appData = { today: [], tomorrow: [], currentPrice: 0 };
     let chartInstance = null;
     let notifyEnabled = false;
+    let lastLoadedHour = -1; // Jälgime, millal viimati andmeid laeti
 
     document.addEventListener("DOMContentLoaded", () => {
         init();
@@ -206,10 +208,47 @@
             notifyEnabled = true;
             updateNotifyBtn();
         }
+
+        // --- AUTOMAATNE VÄRSKENDUS ---
+        
+        // 1. Kui äpp tuleb taustalt (või avatakse tab)
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                checkAndRefresh();
+            }
+        });
+
+        // 2. Kui äpp saab fookuse (mõned brauserid)
+        window.addEventListener("focus", () => {
+            checkAndRefresh();
+        });
+
+        // 3. Iga 1 minuti tagant kontrolli, kas tund on muutunud
+        setInterval(() => {
+            checkAndRefresh();
+        }, 60000);
     });
+
+    // Kontrollib, kas on vaja andmeid uuendada
+    function checkAndRefresh() {
+        const currentHour = new Date().getHours();
+        // Kui tund on muutunud võrreldes viimase laadimisega -> lae uuesti
+        if (currentHour !== lastLoadedHour) {
+            console.log("Tund muutus või äpp ärkas. Uuendan...");
+            init();
+        }
+    }
 
     async function init() {
         await Promise.all([getElectricity(), getWeather()]);
+        
+        // Salvestame, mis tunnil me andmed laadisime
+        lastLoadedHour = new Date().getHours();
+        
+        // Kuvame kellaaja, millal viimati uuendati
+        const now = new Date();
+        const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        document.getElementById('last-update-text').innerText = "Viimati uuendatud: " + timeStr;
     }
 
     async function getElectricity() {
@@ -335,7 +374,6 @@
 
         if(chartInstance) chartInstance.destroy();
 
-        // GRADIENT TAUST GRAAFIKULE (ROHELINE)
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
         gradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
@@ -347,10 +385,10 @@
                 datasets: [{
                     label: 'Hind',
                     data: values,
-                    borderColor: '#4CAF50', // Enefit Roheline Joon
-                    backgroundColor: gradient, // Roheline täide
+                    borderColor: '#4CAF50',
+                    backgroundColor: gradient,
                     borderWidth: 2,
-                    stepped: true, // Astmeline
+                    stepped: true, 
                     fill: true,
                     pointRadius: 0,
                     pointHoverRadius: 6,
