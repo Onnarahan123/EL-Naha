@@ -14,14 +14,12 @@
 
     <style>
         :root {
-            --primary: #2E7D32; /* Sügav roheline */
-            --accent: #4CAF50;  /* Ere roheline */
-            --bg: #f2f4f6;
+            --primary: #4CAF50; /* Enefit Roheline */
+            --bg: #f4f6f8;
             --card: #ffffff;
             --text: #1d1d1f;
             --muted: #86868b;
             --danger: #FF3B30;
-            --warning: #FF9500;
         }
 
         body {
@@ -39,7 +37,6 @@
 
         .container { width: 100%; max-width: 500px; padding-bottom: 80px; }
 
-        /* KAARDID */
         .card {
             background: var(--card);
             border-radius: 22px;
@@ -49,22 +46,19 @@
         }
 
         h2 { 
-            font-size: 13px; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            color: var(--muted); 
-            margin: 0 0 12px 0; 
-            letter-spacing: 0.8px; 
+            font-size: 13px; font-weight: 700; text-transform: uppercase; 
+            color: var(--muted); margin: 0 0 12px 0; letter-spacing: 0.8px; 
         }
 
-        /* 1. HERO ALA (HIND) */
-        .hero { text-align: center; padding-bottom: 5px; }
+        /* 1. HERO (HIND) */
+        .hero { text-align: center; padding-bottom: 15px; }
         .hero-time { 
             background: #e8f5e9; color: var(--primary); 
             padding: 4px 12px; border-radius: 20px; 
             font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 5px;
         }
-        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--text); }
+        /* SIIN ON MUUDATUS: FORCE GREEN COLOR */
+        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); }
         .hero-unit { font-size: 16px; color: var(--muted); font-weight: 500; margin-top: 5px; }
 
         /* VÕRDLUS */
@@ -79,10 +73,7 @@
         /* GRAAFIK */
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .chart-box { height: 320px; width: 100%; position: relative; }
-        .toggle-day { 
-            background: #eee; border: none; padding: 6px 12px; border-radius: 8px; 
-            font-size: 13px; font-weight: 600; color: #555; cursor: pointer;
-        }
+        .toggle-day { background: #eee; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; }
 
         /* TOP/FLOP LISTID */
         .list-row { display: flex; gap: 15px; }
@@ -95,24 +86,18 @@
 
         /* ILM */
         .weather-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .weather-main { display: flex; align-items: center; gap: 10px; }
-        .w-icon { font-size: 24px; }
         .w-text { font-size: 14px; font-weight: 600; }
-        .w-sub { font-size: 13px; color: var(--muted); }
         .w-hint { background: #e3f2fd; color: #1565c0; padding: 10px; border-radius: 10px; font-size: 13px; margin-top: 10px; line-height: 1.4; }
 
         /* KALKULAATOR */
         .preset-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        .preset-btn { flex: 1; background: #f5f5f7; border: none; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; transition: 0.2s; }
-        .preset-btn:active { background: #ddd; transform: scale(0.95); }
+        .preset-btn { flex: 1; background: #f5f5f7; border: none; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; }
         .calc-input-row { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
         .calc-input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: 600; }
 
-        /* TEAVITUSED */
+        /* MUUD */
         .notify-btn { width: 100%; padding: 12px; background: #eee; border: none; border-radius: 12px; font-weight: 600; color: #333; margin-top: 5px; cursor: pointer; }
         .notify-btn.active { background: var(--primary); color: white; }
-
-        /* LOADING & ERROR */
         #loader { text-align: center; color: var(--muted); padding: 40px; }
         .hidden { display: none !important; }
         
@@ -160,7 +145,7 @@
     </div>
 
     <div class="card">
-        <h2>Parimad ja Halvimad ajad</h2>
+        <h2>Soodsamad ja kalleimad</h2>
         <div class="list-row">
             <div class="list-col">
                 <div class="list-header" style="color:var(--primary)">🟢 Soodsamad</div>
@@ -204,22 +189,17 @@
     </div>
 
     <div style="text-align:center; color:#ccc; font-size:11px; margin-top:20px;">
-        Made by Ranno • v3.0 Stable
+        Made by Ranno • v3.1 Green Edition
     </div>
 
 </div>
 
 <script>
-    // --- SEADISTUSED ---
-    const VAT = 1.24; // 24%
-    const LOW_PRICE = 5; // Roheline piir
-    const HIGH_PRICE = 20; // Punane piir
-    
+    const VAT = 1.24; 
     let appData = { today: [], tomorrow: [], currentPrice: 0 };
     let chartInstance = null;
     let notifyEnabled = false;
 
-    // --- INIT ---
     document.addEventListener("DOMContentLoaded", () => {
         init();
         if (Notification.permission === "granted") {
@@ -229,38 +209,28 @@
     });
 
     async function init() {
-        // Laeme paralleelselt elekter ja ilm
         await Promise.all([getElectricity(), getWeather()]);
     }
 
-    // --- ANDMETE HANKIMINE (ROBUSTNE) ---
     async function getElectricity() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
         const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
 
-        // 1. Proovi Corsproxy
         const proxy1 = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
-        // 2. Varuvariant Allorigins
         const proxy2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
 
         let rawData = null;
 
         try {
             const r = await fetch(proxy1);
-            if(r.ok) {
-                const j = await r.json();
-                rawData = j.data.ee;
-            } else throw new Error();
+            if(r.ok) { const j = await r.json(); rawData = j.data.ee; } else throw new Error();
         } catch (e) {
             console.warn("Proxy 1 fail, trying 2...");
             try {
                 const r2 = await fetch(proxy2);
-                if(r2.ok) {
-                    const j2 = await r2.json();
-                    rawData = j2.data.ee;
-                }
+                if(r2.ok) { const j2 = await r2.json(); rawData = j2.data.ee; }
             } catch (e2) {
                 document.getElementById('loader').innerText = "Viga ühenduses Eleringiga.";
                 return;
@@ -277,20 +247,17 @@
         appData.today = data.filter(d => new Date(d.timestamp*1000).toDateString() === todayStr);
         appData.tomorrow = data.filter(d => new Date(d.timestamp*1000).toDateString() === tmrwStr);
 
-        // UI Uuendamine
         document.getElementById('loader').classList.add('hidden');
         document.getElementById('main-content').classList.remove('hidden');
 
         updateHero();
         renderChart();
         updateLists('today');
-        calc(); // Uuenda kalkulaatorit
+        calc();
         checkAlerts();
     }
 
-    // --- UI FUNKTSIOONID ---
     function updateHero() {
-        // Hetkehind
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
         const curr = appData.today.find(d => d.timestamp === nowTs);
         
@@ -303,23 +270,14 @@
             const h = d.getHours().toString().padStart(2,'0');
             const hNext = (d.getHours()+1).toString().padStart(2,'0');
             document.getElementById('current-time').innerText = `${h}:00 – ${hNext}:00`;
-
-            // Värvi muutmine
-            const heroPrice = document.getElementById('current-price');
-            if(price < LOW_PRICE) heroPrice.style.color = 'var(--primary)';
-            else if(price > HIGH_PRICE) heroPrice.style.color = 'var(--danger)';
-            else heroPrice.style.color = 'var(--warning)';
         }
 
-        // Keskmised
         const avgToday = getAvg(appData.today);
         document.getElementById('avg-today').innerText = avgToday;
 
         if(appData.tomorrow.length > 0) {
             const avgTom = getAvg(appData.tomorrow);
             document.getElementById('avg-tomorrow').innerText = avgTom;
-            
-            // Erinevus
             const diff = ((avgTom - avgToday) / avgToday * 100).toFixed(0);
             const tag = document.getElementById('diff-tag');
             tag.classList.remove('hidden');
@@ -339,11 +297,9 @@
     function updateLists(day) {
         const data = day === 'today' ? appData.today : appData.tomorrow;
         if(!data.length) return;
-
         const sorted = [...data].sort((a,b) => a.price - b.price);
         const cheap = sorted.slice(0,3);
         const exp = sorted.slice(-3).reverse();
-
         const render = (arr, elId, isGood) => {
             const el = document.getElementById(elId);
             el.innerHTML = arr.map(i => {
@@ -354,17 +310,14 @@
                 return `<div class="item-row"><span>${h}:00–${(d.getHours()+1).toString().padStart(2,'0')}</span><span class="${cls}">${p} s</span></div>`;
             }).join('');
         };
-
         render(cheap, 'list-cheap', true);
         render(exp, 'list-expensive', false);
     }
 
-    // --- GRAAFIK ---
     function renderChart() {
         const mode = document.getElementById('day-select').value;
         const data = mode === 'today' ? appData.today : appData.tomorrow;
         
-        // Kui andmeid pole (Homme)
         if(!data.length) {
             document.getElementById('priceChart').style.display = 'none';
             document.getElementById('no-data-msg').classList.remove('hidden');
@@ -372,7 +325,7 @@
         } else {
             document.getElementById('priceChart').style.display = 'block';
             document.getElementById('no-data-msg').classList.add('hidden');
-            updateLists(mode); // Uuenda ka liste
+            updateLists(mode);
         }
 
         const ctx = document.getElementById('priceChart').getContext('2d');
@@ -382,6 +335,11 @@
 
         if(chartInstance) chartInstance.destroy();
 
+        // GRADIENT TAUST GRAAFIKULE (ROHELINE)
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
+        gradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
+
         chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
@@ -389,20 +347,13 @@
                 datasets: [{
                     label: 'Hind',
                     data: values,
-                    borderWidth: 3,
-                    stepped: true, // ENEFIT STIIL
-                    fill: false,
+                    borderColor: '#4CAF50', // Enefit Roheline Joon
+                    backgroundColor: gradient, // Roheline täide
+                    borderWidth: 2,
+                    stepped: true, // Astmeline
+                    fill: true,
                     pointRadius: 0,
                     pointHoverRadius: 6,
-                    // Värviline joon
-                    segment: {
-                        borderColor: ctx => {
-                            const v = ctx.p0.parsed.y;
-                            if(v < 10) return '#4CAF50';
-                            if(v > 20) return '#FF3B30';
-                            return '#FF9500';
-                        }
-                    }
                 }]
             },
             options: {
@@ -414,11 +365,8 @@
                     annotation: {
                         annotations: {
                             line1: {
-                                type: 'line',
-                                yMin: avg, yMax: avg,
-                                borderColor: 'rgba(0,0,0,0.3)',
-                                borderDash: [5,5],
-                                borderWidth: 2
+                                type: 'line', yMin: avg, yMax: avg,
+                                borderColor: 'rgba(0,0,0,0.3)', borderDash: [5,5], borderWidth: 2
                             }
                         }
                     },
@@ -434,43 +382,34 @@
                 },
                 scales: {
                     x: { grid: { display:false } },
-                    y: { beginAtZero: true }
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
                 }
             }
         });
     }
 
-    // --- ILM (VÕRU) ---
     async function getWeather() {
         try {
             const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=57.848&longitude=27.014&current=temperature_2m,weather_code,wind_speed_10m");
             const j = await r.json();
             const curr = j.current;
-            
             const temp = curr.temperature_2m;
             const wind = curr.wind_speed_10m;
-            
             let hint = "";
             if(wind > 20) hint = "🌪 Tugev tuul – see surub tavaliselt elektrihinda alla!";
             else if(temp < -10) hint = "❄️ Külm ilm tõstab tavaliselt tarbimist ja hinda.";
             else if(wind < 5 && temp < 5) hint = "Vähe tuult ja jahe – hinnad võivad olla kõrgemad.";
-            else hint = "Ilm on stabiilne, suuri anomaaliaid hinna osas ei ennusta.";
+            else hint = "Ilm on stabiilne.";
 
             document.getElementById('weather-box').innerHTML = `
                 <div class="weather-row">
-                    <div class="weather-main">
+                    <div class="weather-main" style="display:flex; gap:10px; align-items:center;">
                         <span class="w-icon">🌡️</span>
-                        <div>
-                            <div class="w-text">${temp}°C</div>
-                            <div class="w-sub">Temperatuur</div>
-                        </div>
+                        <div><div class="w-text">${temp}°C</div><div class="w-sub">Temperatuur</div></div>
                     </div>
-                    <div class="weather-main">
+                    <div class="weather-main" style="display:flex; gap:10px; align-items:center;">
                         <span class="w-icon">💨</span>
-                        <div>
-                            <div class="w-text">${wind} km/h</div>
-                            <div class="w-sub">Tuul</div>
-                        </div>
+                        <div><div class="w-text">${wind} km/h</div><div class="w-sub">Tuul</div></div>
                     </div>
                 </div>
                 <div class="w-hint">💡 ${hint}</div>
@@ -478,11 +417,7 @@
         } catch(e) { document.getElementById('weather-box').innerText = "Ilma info ei lae"; }
     }
 
-    // --- KALKULAATOR ---
-    function setWatts(w) {
-        document.getElementById('watts').value = w;
-        calc();
-    }
+    function setWatts(w) { document.getElementById('watts').value = w; calc(); }
     function calc() {
         const w = document.getElementById('watts').value;
         const price = appData.currentPrice;
@@ -492,25 +427,17 @@
         }
     }
 
-    // --- TEAVITUSED ---
     function toggleNotify() {
         if (!("Notification" in window)) return alert("Brauser ei toeta seda.");
         Notification.requestPermission().then(p => {
-            if(p === "granted") {
-                notifyEnabled = true;
-                updateNotifyBtn();
-                checkAlerts();
-            }
+            if(p === "granted") { notifyEnabled = true; updateNotifyBtn(); checkAlerts(); }
         });
     }
     function updateNotifyBtn() {
         const b = document.getElementById('btn-notify');
         if(notifyEnabled) { b.innerText = "Teavitused aktiivsed ✅"; b.classList.add('active'); }
     }
-    function checkAlerts() {
-        if(!notifyEnabled || !appData.currentPrice) return;
-        // Siin saab lisada loogika (nt salvestada 'lastNotified' localStorage'isse)
-    }
+    function checkAlerts() { if(!notifyEnabled || !appData.currentPrice) return; }
 
 </script>
 </body>
