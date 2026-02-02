@@ -14,7 +14,7 @@
 
     <style>
         :root {
-            --primary: #4CAF50;
+            --primary: #4CAF50; /* Puhas roheline */
             --bg: #f4f6f8;
             --card: #ffffff;
             --text: #1d1d1f;
@@ -37,78 +37,32 @@
 
         .container { width: 100%; max-width: 500px; padding-bottom: 80px; }
 
-        /* --- CARD BASE --- */
         .card {
             background: var(--card);
             border-radius: 22px;
             padding: 20px;
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            position: relative;
-            overflow: hidden; /* Oluline efektide jaoks */
-            transition: all 0.5s ease;
         }
 
-        /* --- LIVE MOOD EFFECTS (MEELEOLUD) --- */
-
-        /* 1. ODAV (AURORA) */
-        .mode-cheap {
-            background: linear-gradient(120deg, #ffffff, #e8f5e9, #c8e6c9, #ffffff);
-            background-size: 400% 400%;
-            border: 1px solid #4CAF50;
-            animation: aurora 15s ease infinite;
-        }
-        @keyframes aurora {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        h2 { 
+            font-size: 13px; font-weight: 700; text-transform: uppercase; 
+            color: var(--muted); margin: 0 0 12px 0; letter-spacing: 0.8px; 
         }
 
-        /* 2. KALLIS (STORM) */
-        .mode-expensive {
-            background: #fff5f5; /* Kerge punakas toon */
-            border: 1px solid #ffcdd2;
-        }
-        /* Välgatus */
-        .mode-expensive::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%);
-            background-size: 200% 200%;
-            opacity: 0;
-            pointer-events: none;
-            animation: storm-flash 20s infinite; /* Iga 20s tagant */
-        }
-        @keyframes storm-flash {
-            0% { opacity: 0; transform: translateX(-100%); }
-            90% { opacity: 0; } /* Oota kaua */
-            92% { opacity: 0.8; transform: translateX(100%); } /* Sähvatus üle ekraani */
-            93% { opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        /* 3. NORMAALNE */
-        .mode-normal {
-            background: #ffffff;
-            border: 1px solid transparent;
-        }
-
-        /* --- TYPOGRAPHY --- */
-        h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin: 0 0 12px 0; letter-spacing: 0.8px; }
-
-        .hero { text-align: center; padding-bottom: 15px; z-index: 1; }
+        /* 1. HERO (ALATI ROHELINE) */
+        .hero { text-align: center; padding-bottom: 15px; }
         .hero-time { 
-            background: rgba(0,0,0,0.05); color: #555; 
+            background: #e8f5e9; color: var(--primary); 
             padding: 4px 12px; border-radius: 20px; 
             font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 5px;
         }
-        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); transition: color 0.5s; }
+        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); }
         .hero-unit { font-size: 16px; color: var(--muted); font-weight: 500; margin-top: 5px; }
 
         /* VÕRDLUS */
         .compare-grid { display: flex; gap: 10px; margin-top: 20px; }
-        .comp-box { flex: 1; background: rgba(255,255,255,0.6); padding: 12px; border-radius: 14px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
+        .comp-box { flex: 1; background: #f9f9f9; padding: 12px; border-radius: 14px; text-align: center; }
         .comp-title { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 600; }
         .comp-val { font-size: 18px; font-weight: 700; margin-top: 4px; display: block; }
         .diff-tag { font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
@@ -120,11 +74,12 @@
         .chart-box { height: 320px; width: 100%; position: relative; }
         .toggle-day { background: #eee; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; }
 
-        /* LISTID */
+        /* TOP/FLOP LISTID */
         .list-row { display: flex; gap: 15px; }
         .list-col { flex: 1; }
         .list-header { font-size: 12px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
         .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+        .item-row:last-child { border-bottom: none; }
         .price-good { color: var(--primary); font-weight: 600; }
         .price-bad { color: var(--danger); font-weight: 600; }
 
@@ -145,13 +100,14 @@
         #loader { text-align: center; color: var(--muted); padding: 40px; }
         .hidden { display: none !important; }
         .last-update { text-align: center; color: #ccc; font-size: 10px; margin-top: 5px; }
+        
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <div class="card hero" id="hero-card">
+    <div class="card hero">
         <div id="loader">Laen andmeid...</div>
         <div id="main-content" class="hidden">
             <div id="current-time" class="hero-time">--:--</div>
@@ -224,54 +180,56 @@
         <div style="text-align:right; margin-top:10px; font-size:15px; font-weight:600;" id="calc-result">...</div>
     </div>
 
-    <div class="card">
-        <h2>Teavitused</h2>
-        <div style="font-size:13px; color:#666; margin-bottom:10px;">
-            Teavita, kui hind on väga odav (< 5s) või kui homme on kallis.
-        </div>
-        <button id="btn-notify" class="notify-btn" onclick="toggleNotify()">Luba teavitused</button>
-    </div>
-
     <div class="last-update" id="last-update-text"></div>
     <div style="text-align:center; color:#ccc; font-size:11px; margin-top:5px; margin-bottom:20px;">
-        Made by Ranno • v4.0 Live Effects
+        Made by Ranno • v3.3 Forced Refresh
     </div>
 
 </div>
 
 <script>
     const VAT = 1.24; 
-    const LOW_PRICE = 5; 
-    const HIGH_PRICE = 20;
-
     let appData = { today: [], tomorrow: [], currentPrice: 0 };
     let chartInstance = null;
-    let notifyEnabled = false;
     let lastLoadedHour = -1;
 
     document.addEventListener("DOMContentLoaded", () => {
         init();
-        if (Notification.permission === "granted") { notifyEnabled = true; updateNotifyBtn(); }
         
-        // Auto-refresh logic
-        document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkAndRefresh(); });
-        window.addEventListener("focus", () => checkAndRefresh());
-        setInterval(() => checkAndRefresh(), 60000);
+        // --- SUNDVÄRSKENDUS ---
+        // Iga kord kui leht muutub nähtavaks (tuled teisest äpist)
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                checkAndReload();
+            }
+        });
+
+        // Või kui teed telefonis "Pull to refresh" (kui äpp lubab)
+        window.addEventListener("focus", checkAndReload);
+
+        // Iga minut kontrolli taustal
+        setInterval(checkAndReload, 60000);
     });
 
-    function checkAndRefresh() {
+    function checkAndReload() {
         const currentHour = new Date().getHours();
-        if (currentHour !== lastLoadedHour) {
-            console.log("Refreshing...");
-            init();
+        // Kui tund on vahetunud võrreldes viimase laadimisega
+        if (lastLoadedHour !== -1 && currentHour !== lastLoadedHour) {
+            // FORCE RELOAD: Lae terve leht uuesti, et saada värske kood ja andmed
+            window.location.reload(); 
+        } else {
+            // Lihtsalt uuenda andmeid taustal
+            getElectricity();
         }
     }
 
     async function init() {
         await Promise.all([getElectricity(), getWeather()]);
         lastLoadedHour = new Date().getHours();
+        
         const now = new Date();
-        document.getElementById('last-update-text').innerText = "Uuendatud: " + now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        document.getElementById('last-update-text').innerText = "Viimati kontrollitud: " + timeStr;
     }
 
     async function getElectricity() {
@@ -280,10 +238,12 @@
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
         const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
 
+        // Kasutame 'corsproxy.io', see on stabiilsem
         const proxy1 = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
         const proxy2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
 
         let rawData = null;
+
         try {
             const r = await fetch(proxy1);
             if(r.ok) { const j = await r.json(); rawData = j.data.ee; } else throw new Error();
@@ -292,10 +252,11 @@
                 const r2 = await fetch(proxy2);
                 if(r2.ok) { const j2 = await r2.json(); rawData = j2.data.ee; }
             } catch (e2) {
-                document.getElementById('loader').innerText = "Viga ühenduses Eleringiga.";
+                document.getElementById('loader').innerText = "Viga ühenduses!";
                 return;
             }
         }
+
         if(rawData) processElectricity(rawData);
     }
 
@@ -319,36 +280,15 @@
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
         const curr = appData.today.find(d => d.timestamp === nowTs);
         
-        const card = document.getElementById('hero-card');
-        const priceEl = document.getElementById('current-price');
-        
-        // Reset classes
-        card.classList.remove('mode-cheap', 'mode-normal', 'mode-expensive');
-
         if(curr) {
             const price = (curr.price / 10 * VAT);
             appData.currentPrice = price;
-            priceEl.innerText = price.toFixed(2);
+            document.getElementById('current-price').innerText = price.toFixed(2);
             
             const d = new Date(curr.timestamp*1000);
             const h = d.getHours().toString().padStart(2,'0');
             const hNext = (d.getHours()+1).toString().padStart(2,'0');
             document.getElementById('current-time').innerText = `${h}:00 – ${hNext}:00`;
-
-            // --- LIVE EFFECTS LOGIC ---
-            if(price < LOW_PRICE) {
-                // ODAV: Aurora
-                card.classList.add('mode-cheap');
-                priceEl.style.color = '#2E7D32'; // Tume roheline
-            } else if(price > HIGH_PRICE) {
-                // KALLIS: Torm
-                card.classList.add('mode-expensive');
-                priceEl.style.color = '#D32F2F'; // Tume punane
-            } else {
-                // NORMAALNE
-                card.classList.add('mode-normal');
-                priceEl.style.color = '#1d1d1f'; // Tavaline must
-            }
         }
 
         const avgToday = getAvg(appData.today);
@@ -414,6 +354,7 @@
 
         if(chartInstance) chartInstance.destroy();
 
+        // ÜLENI ROHELINE GRAAFIK
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
         gradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
@@ -425,10 +366,10 @@
                 datasets: [{
                     label: 'Hind',
                     data: values,
-                    borderColor: '#4CAF50',
+                    borderColor: '#4CAF50', // Enefit Roheline Joon ALATI
                     backgroundColor: gradient,
                     borderWidth: 2,
-                    stepped: true,
+                    stepped: true, // Astmeline
                     fill: true,
                     pointRadius: 0,
                     pointHoverRadius: 6,
@@ -458,7 +399,10 @@
                         }
                     }
                 },
-                scales: { x: { grid: { display:false } }, y: { beginAtZero: true, grid: { color: '#f0f0f0' } } }
+                scales: {
+                    x: { grid: { display:false } },
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
+                }
             }
         });
     }
@@ -494,17 +438,6 @@
             const cost = (w/1000 * price).toFixed(2);
             document.getElementById('calc-result').innerHTML = `Kulu hetkel: <span style="color:var(--primary)">${cost} senti</span> / tund`;
         }
-    }
-
-    function toggleNotify() {
-        if (!("Notification" in window)) return alert("Brauser ei toeta seda.");
-        Notification.requestPermission().then(p => {
-            if(p === "granted") { notifyEnabled = true; updateNotifyBtn(); }
-        });
-    }
-    function updateNotifyBtn() {
-        const b = document.getElementById('btn-notify');
-        if(notifyEnabled) { b.innerText = "Teavitused aktiivsed ✅"; b.classList.add('active'); }
     }
 </script>
 </body>
