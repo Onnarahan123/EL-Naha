@@ -37,7 +37,6 @@
 
         .container { width: 100%; max-width: 500px; padding-bottom: 80px; }
 
-        /* --- CARD --- */
         .card {
             background: var(--card);
             border-radius: 22px;
@@ -49,9 +48,7 @@
             transition: all 0.5s ease;
         }
 
-        /* --- EFEKTID (LIVE ANIMATSIOONID) --- */
-        
-        /* 1. AURORA (ODAV) */
+        /* --- LIVE EFEKTID --- */
         .effect-aurora {
             background: linear-gradient(120deg, #ffffff, #e8f5e9, #c8e6c9, #ffffff);
             background-size: 300% 300%;
@@ -64,7 +61,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 2. PULSE (KALLIS) */
         .effect-pulse {
             background: #fff;
             animation: pulse-red 4s infinite;
@@ -219,7 +215,7 @@
 
     <div class="last-update" id="last-update-text"></div>
     <div style="text-align:center; color:#ccc; font-size:11px; margin-top:5px; margin-bottom:20px;">
-        Made by Ranno • v3.4 Live Effects
+        Made by Ranno • v3.5 Future Focus
     </div>
 
 </div>
@@ -227,7 +223,7 @@
 <script>
     const VAT = 1.24; 
     const LOW_PRICE = 5; 
-    const HIGH_PRICE = 15; // Piir, kust algab "Kallis" (punane efekt)
+    const HIGH_PRICE = 15;
 
     let appData = { today: [], tomorrow: [], currentPrice: 0 };
     let chartInstance = null;
@@ -246,7 +242,7 @@
     function checkAndReload() {
         const currentHour = new Date().getHours();
         if (lastLoadedHour !== -1 && currentHour !== lastLoadedHour) window.location.reload(); 
-        else getElectricity(); // Taustavärskendus
+        else getElectricity();
     }
 
     async function init() {
@@ -303,7 +299,6 @@
         const card = document.getElementById('hero-card');
         const priceEl = document.getElementById('current-price');
         
-        // Eemalda vanad efektid
         card.classList.remove('effect-aurora', 'effect-pulse');
 
         if(curr) {
@@ -316,17 +311,13 @@
             const hNext = (d.getHours()+1).toString().padStart(2,'0');
             document.getElementById('current-time').innerText = `${h}:00 – ${hNext}:00`;
 
-            // RAKENDA EFEKTID
             if(price < LOW_PRICE) {
-                // AURORA (Odav)
                 card.classList.add('effect-aurora');
                 priceEl.style.color = '#2E7D32'; 
             } else if (price > HIGH_PRICE) {
-                // PULSE (Kallis)
                 card.classList.add('effect-pulse');
                 priceEl.style.color = '#D32F2F'; 
             } else {
-                // Tavaline
                 priceEl.style.color = '#1d1d1f';
             }
         }
@@ -375,8 +366,14 @@
 
     function renderChart() {
         const mode = document.getElementById('day-select').value;
-        const data = mode === 'today' ? appData.today : appData.tomorrow;
+        let data = mode === 'today' ? appData.today : appData.tomorrow;
         
+        // --- FILTREERIMINE: NÄITA AINULT TULEVIKKU (TÄNASE PUHUL) ---
+        if (mode === 'today') {
+            const currentH = new Date().getHours();
+            data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH);
+        }
+
         if(!data.length) {
             document.getElementById('priceChart').style.display = 'none';
             document.getElementById('no-data-msg').classList.remove('hidden');
@@ -390,8 +387,10 @@
         const ctx = document.getElementById('priceChart').getContext('2d');
         const labels = data.map(d => new Date(d.timestamp*1000).getHours());
         const values = data.map(d => parseFloat((d.price/10*VAT).toFixed(2)));
-        const avg = parseFloat(getAvg(data));
-        const currentHour = new Date().getHours();
+        
+        // Keskmine arvutatakse ikka kogu päeva pealt, et joon oleks loogiline
+        const dayFullData = mode === 'today' ? appData.today : appData.tomorrow;
+        const avg = parseFloat(getAvg(dayFullData));
 
         if(chartInstance) chartInstance.destroy();
 
@@ -411,11 +410,8 @@
                     borderWidth: 2,
                     stepped: true,
                     fill: true,
-                    // PUNKT AINULT PRAEGUSEL TUNNIL
-                    pointRadius: (ctx) => {
-                        if(mode === 'today' && ctx.dataIndex === currentHour) return 6;
-                        return 0;
-                    },
+                    // PUNKT ALATI ESIMESELE (SEST ESIMENE ONGI "HETKEL")
+                    pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, 
                     pointBackgroundColor: '#4CAF50',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
@@ -432,7 +428,8 @@
                         annotations: {
                             line1: {
                                 type: 'line', yMin: avg, yMax: avg,
-                                borderColor: 'rgba(0,0,0,0.3)', borderDash: [5,5], borderWidth: 2
+                                borderColor: 'rgba(0,0,0,0.3)', borderDash: [5,5], borderWidth: 2,
+                                label: { display: true, content: 'Keskmine', position: 'end', color: '#888', font: {size:10} }
                             }
                         }
                     },
@@ -445,8 +442,8 @@
                 scales: {
                     x: { 
                         grid: { display:false },
-                        // NÄITA KÕIKI TUNDE 00..23
-                        ticks: { maxTicksLimit: 25, autoSkip: false, font: {size: 10} }
+                        // NÄITA KÕIKI TUNDE, MIS ON ALLES
+                        ticks: { maxTicksLimit: 24, autoSkip: false, font: {size: 11} }
                     },
                     y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
                 }
