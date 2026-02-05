@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nutikas Elekter</title>
+    <title>Nutikas Elekter v5</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
     <style>
+        /* --- TEEMAD (LIGHT / DARK) --- */
         :root {
             --primary: #4CAF50;
             --bg: #f4f6f8;
@@ -20,6 +21,19 @@
             --text: #1d1d1f;
             --muted: #86868b;
             --danger: #FF3B30;
+            --border: rgba(0,0,0,0.05);
+            --modal-bg: rgba(255,255,255,0.95);
+            --chart-grid: #f0f0f0;
+        }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --card: #1c1c1e;
+            --text: #f5f5f7;
+            --muted: #a1a1a6;
+            --border: rgba(255,255,255,0.1);
+            --modal-bg: #1c1c1e;
+            --chart-grid: #333;
         }
 
         body {
@@ -33,9 +47,15 @@
             align-items: center;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container { width: 100%; max-width: 500px; padding-bottom: 80px; }
+
+        /* HEADER & SETTINGS */
+        .app-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px; }
+        .app-title { font-weight: 800; font-size: 20px; color: var(--primary); }
+        .settings-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text); }
 
         /* CARD */
         .card {
@@ -46,111 +66,125 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             position: relative;
             overflow: hidden; 
-            transition: all 0.5s ease;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
         }
 
         /* LIVE EFEKTID */
         .effect-aurora {
-            background: linear-gradient(120deg, #ffffff, #e8f5e9, #c8e6c9, #ffffff);
+            background: linear-gradient(120deg, var(--card), rgba(76, 175, 80, 0.15), var(--card));
             background-size: 300% 300%;
             animation: aurora-move 8s ease infinite;
-            border: 1px solid #4CAF50;
+            border: 1px solid var(--primary);
         }
-        @keyframes aurora-move {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes aurora-move { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .effect-pulse {
-            background: #fff;
             animation: pulse-red 4s infinite;
-            border: 1px solid #ffcdd2;
+            border: 1px solid rgba(255, 59, 48, 0.3);
         }
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); border-color: #ffcdd2; }
-            50% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); border-color: #ef5350; }
-            100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); border-color: #ffcdd2; }
-        }
-
-        h2 { 
-            font-size: 13px; font-weight: 700; text-transform: uppercase; 
-            color: var(--muted); margin: 0 0 12px 0; letter-spacing: 0.8px; 
-        }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.2); } 50% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
 
         /* HERO */
         .hero { text-align: center; padding-bottom: 15px; }
-        .hero-time { 
-            background: rgba(0,0,0,0.05); color: #444; 
-            padding: 4px 12px; border-radius: 20px; 
-            font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 5px;
-        }
-        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); transition: color 0.3s; }
+        .hero-time { background: rgba(128,128,128,0.1); color: var(--text); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 5px; }
+        .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--primary); }
         .hero-unit { font-size: 16px; color: var(--muted); font-weight: 500; margin-top: 5px; }
 
-        /* VÕRDLUS */
-        .compare-grid { display: flex; gap: 10px; margin-top: 20px; }
-        .comp-box { flex: 1; background: rgba(255,255,255,0.7); padding: 12px; border-radius: 14px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
-        .comp-title { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 600; }
-        .comp-val { font-size: 18px; font-weight: 700; margin-top: 4px; display: block; }
-        .diff-tag { font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
-        .diff-up { background: #ffebee; color: var(--danger); }
-        .diff-down { background: #e8f5e9; color: var(--primary); }
+        /* 24H KELL (CLOCK) */
+        .clock-container { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+        #clock-canvas { width: 100%; height: 100%; transform: rotate(-90deg); /* 00:00 üles */ }
+        .clock-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .clock-now-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+        .clock-now-val { font-size: 24px; font-weight: 800; color: var(--text); }
+
+        /* TARK LAADIJA */
+        .charger-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .slider-container { width: 100%; margin-bottom: 10px; }
+        input[type=range] { width: 100%; accent-color: var(--primary); }
+        .charge-result { background: rgba(76, 175, 80, 0.1); border-radius: 12px; padding: 15px; text-align: center; }
+        .charge-time { font-size: 22px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 5px; }
+        .charge-saving { font-size: 13px; color: var(--muted); }
 
         /* GRAAFIK */
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .chart-box { height: 320px; width: 100%; position: relative; }
-        .toggle-day { background: #eee; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; }
+        .chart-box { height: 280px; width: 100%; position: relative; }
+        .toggle-day { background: rgba(128,128,128,0.1); border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
+
+        /* PÄIKE & ILM */
+        .weather-grid { display: flex; gap: 10px; }
+        .w-box { flex: 1; background: rgba(128,128,128,0.05); padding: 10px; border-radius: 12px; text-align: center; }
+        .w-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+        .w-val { font-weight: 700; font-size: 14px; }
+        .w-label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+
+        /* SÄTTED MODAL */
+        #settings-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 999; align-items: flex-end; /* Sheet style */
+        }
+        .modal-content {
+            background: var(--modal-bg); width: 100%; border-radius: 20px 20px 0 0;
+            padding: 30px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .setting-input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; text-align: center; font-size: 16px; background: var(--bg); color: var(--text); }
+        .close-btn { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 15px; color: white; font-weight: 700; font-size: 16px; margin-top: 10px; }
 
         /* LISTID */
         .list-row { display: flex; gap: 15px; }
         .list-col { flex: 1; }
-        .list-header { font-size: 12px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
-        .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; } /* Suurendasin paddingut */
-        .price-good { color: var(--primary); font-weight: 600; }
-        .price-bad { color: var(--danger); font-weight: 600; }
-
-        /* ILM */
-        .weather-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .w-text { font-size: 14px; font-weight: 600; }
-        .w-hint { background: #e3f2fd; color: #1565c0; padding: 10px; border-radius: 10px; font-size: 13px; margin-top: 10px; line-height: 1.4; }
-
-        /* KALKULAATOR */
-        .preset-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        .preset-btn { flex: 1; background: #f5f5f7; border: none; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; }
-        .calc-input-row { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .calc-input { width: 80px; padding: 8px; border-radius: 8px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: 600; }
-
-        /* MUUD */
-        .notify-btn { width: 100%; padding: 12px; background: #eee; border: none; border-radius: 12px; font-weight: 600; color: #333; margin-top: 5px; cursor: pointer; }
-        .notify-btn.active { background: var(--primary); color: white; }
-        #loader { text-align: center; color: var(--muted); padding: 40px; }
+        .list-header { font-size: 12px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; color: var(--muted); }
+        .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        
+        h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin: 0 0 12px 0; letter-spacing: 0.8px; }
+        .last-update { text-align: center; color: var(--muted); font-size: 10px; margin-top: 5px; }
         .hidden { display: none !important; }
-        .last-update { text-align: center; color: #ccc; font-size: 10px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
 
+    <div class="app-header">
+        <div class="app-title">⚡️ Nutikas Elekter</div>
+        <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    </div>
+
     <div class="card hero" id="hero-card">
-        <div id="loader">Laen andmeid...</div>
-        <div id="main-content" class="hidden">
+        <div id="main-content">
             <div id="current-time" class="hero-time">--:--</div>
             <div id="current-price" class="hero-price">--</div>
-            <div class="hero-unit">senti / kWh (KM 24%)</div>
+            <div class="hero-unit">senti / kWh (KM <span id="vat-display">24</span>%)</div>
+        </div>
+    </div>
 
-            <div class="compare-grid">
-                <div class="comp-box">
-                    <div class="comp-title">Täna keskmine</div>
-                    <div id="avg-today" class="comp-val">--</div>
-                </div>
-                <div class="comp-box">
-                    <div class="comp-title">Homme keskmine</div>
-                    <div id="avg-tomorrow" class="comp-val">--</div>
-                    <div id="diff-tag" class="hidden"></div>
-                </div>
+    <div class="card" style="text-align:center;">
+        <h2>Ööpäeva ülevaade</h2>
+        <div class="clock-container">
+            <canvas id="clock-canvas"></canvas>
+            <div class="clock-center">
+                <div class="clock-now-label">Hetkel</div>
+                <div class="clock-now-val" id="clock-now-val">--</div>
             </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🚗 Tark Laadija</h2>
+        <div class="charger-row">
+            <span>Laadimise aeg: <b id="charge-duration-lbl">4</b> tundi</span>
+        </div>
+        <div class="slider-container">
+            <input type="range" min="1" max="12" value="4" id="charge-slider" oninput="calcSmartCharge()">
+        </div>
+        <div class="charge-result">
+            <span class="charge-saving" id="charge-saving-text">Parim aeg alustamiseks:</span>
+            <span class="charge-time" id="best-charge-time">--:--</span>
+            <span class="charge-saving" id="charge-avg-price">--</span>
         </div>
     </div>
 
@@ -164,136 +198,170 @@
         </div>
         <div class="chart-box">
             <canvas id="priceChart"></canvas>
-            <div id="no-data-msg" class="hidden" style="position:absolute; top:40%; left:0; right:0; text-align:center; color:#888;">
-                Andmed puuduvad.<br>Homsed hinnad selguvad ~14:00
+            <div id="no-data-msg" class="hidden" style="position:absolute; top:40%; left:0; right:0; text-align:center; color:var(--muted);">
+                Andmed puuduvad
             </div>
         </div>
     </div>
 
     <div class="card">
-        <h2>Soodne ja Kallis</h2>
         <div class="list-row">
             <div class="list-col">
-                <div class="list-header" style="color:var(--primary)">🟢 Soodne</div>
+                <div class="list-header" style="color:var(--primary)">🟢 SOODNE</div>
                 <div id="list-cheap"></div>
             </div>
             <div class="list-col">
-                <div class="list-header" style="color:var(--danger)">🔴 Kallis</div>
+                <div class="list-header" style="color:var(--danger)">🔴 KALLIS</div>
                 <div id="list-expensive"></div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <h2>Ilm ja Seosed (Võru)</h2>
-        <div id="weather-box">
-            <div style="color:#999;">Laen ilmainfot...</div>
+        <h2>Ilm & Päike (Võru)</h2>
+        <div class="weather-grid">
+            <div class="w-box">
+                <span class="w-icon">🌡️</span>
+                <div class="w-val" id="w-temp">--°</div>
+                <div class="w-label">Temp</div>
+            </div>
+            <div class="w-box">
+                <span class="w-icon">💨</span>
+                <div class="w-val" id="w-wind">-- m/s</div>
+                <div class="w-label">Tuul</div>
+            </div>
+            <div class="w-box">
+                <span class="w-icon" id="w-solar-icon">☀️</span>
+                <div class="w-val" id="w-solar">--</div>
+                <div class="w-label">Päike</div>
+            </div>
         </div>
-    </div>
-
-    <div class="card">
-        <h2>Kalkulaator</h2>
-        <div class="preset-row">
-            <button class="preset-btn" onclick="setWatts(10)">💡</button>
-            <button class="preset-btn" onclick="setWatts(2000)">🧺</button>
-            <button class="preset-btn" onclick="setWatts(9000)">🧖</button>
-            <button class="preset-btn" onclick="setWatts(11000)">🚗</button>
-        </div>
-        <div class="calc-input-row">
-            <span>Võimsus (W):</span>
-            <input type="number" id="watts" value="2000" class="calc-input" oninput="calc()">
-        </div>
-        <div style="text-align:right; margin-top:10px; font-size:15px; font-weight:600;" id="calc-result">...</div>
-    </div>
-
-    <div class="card">
-        <h2>Teavitused</h2>
-        <div style="font-size:13px; color:#666; margin-bottom:10px;">
-            Teavita, kui hind on odav (< 5s) või kui homme on kallim.
-        </div>
-        <button id="btn-notify" class="notify-btn" onclick="toggleNotify()">Luba teavitused</button>
     </div>
 
     <div class="last-update" id="last-update-text"></div>
-    <div style="text-align:center; color:#ccc; font-size:11px; margin-top:5px; margin-bottom:20px;">
-        Made by Ranno • v3.6 Clean Axis
+    <div style="text-align:center; color:var(--muted); font-size:11px; margin-top:5px; margin-bottom:20px;">
+        v5.0 Ultimate • Cache Enabled
     </div>
 
 </div>
 
-<script>
-    const VAT = 1.24; 
-    const LOW_PRICE = 5; 
-    const HIGH_PRICE = 15;
+<div id="settings-modal">
+    <div class="modal-content">
+        <h2 style="font-size:18px; margin-bottom:20px;">Sätted</h2>
+        
+        <div class="setting-row">
+            <span>Tume režiim</span>
+            <button class="toggle-day" onclick="toggleTheme()" id="theme-toggle-btn">Auto</button>
+        </div>
 
-    let appData = { today: [], tomorrow: [], currentPrice: 0 };
+        <div class="setting-row">
+            <span>Käibemaks (%)</span>
+            <input type="number" id="set-vat" class="setting-input" value="24">
+        </div>
+
+        <div class="setting-row">
+            <span>Odava piir (s/kWh)</span>
+            <input type="number" id="set-low" class="setting-input" value="5">
+        </div>
+
+        <div class="setting-row">
+            <span>Kalli piir (s/kWh)</span>
+            <input type="number" id="set-high" class="setting-input" value="15">
+        </div>
+
+        <button class="close-btn" onclick="saveSettings()">Salvesta ja Sulge</button>
+    </div>
+</div>
+
+<script>
+    // --- GLOBAL STATE ---
+    let settings = {
+        vat: 1.24,
+        lowPrice: 5,
+        highPrice: 15,
+        theme: 'auto' // 'auto', 'dark', 'light'
+    };
+
+    let appData = { today: [], tomorrow: [], all: [] }; // all: today + tomorrow for calc
     let chartInstance = null;
-    let notifyEnabled = false;
+    let clockInstance = null;
     let lastLoadedHour = -1;
 
+    // --- INIT ---
     document.addEventListener("DOMContentLoaded", () => {
-        init();
-        if (Notification.permission === "granted") { notifyEnabled = true; updateNotifyBtn(); }
+        loadSettings();
+        applyTheme();
         
+        // 1. Proovi laadida vahemälust (Instant Load)
+        loadCache();
+
+        // 2. Värskenda andmeid taustal
+        init();
+
+        // Auto-refresh triggers
         document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkAndReload(); });
-        window.addEventListener("focus", checkAndReload);
         setInterval(checkAndReload, 60000);
     });
 
     function checkAndReload() {
-        const currentHour = new Date().getHours();
-        if (lastLoadedHour !== -1 && currentHour !== lastLoadedHour) window.location.reload(); 
+        const h = new Date().getHours();
+        if (lastLoadedHour !== -1 && h !== lastLoadedHour) window.location.reload(); 
         else getElectricity();
     }
 
     async function init() {
         await Promise.all([getElectricity(), getWeather()]);
         lastLoadedHour = new Date().getHours();
-        const now = new Date();
-        document.getElementById('last-update-text').innerText = "Viimati kontrollitud: " + now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        document.getElementById('last-update-text').innerText = "Värskendatud: " + new Date().toLocaleTimeString();
     }
 
+    // --- DATA FETCHING & CACHING ---
     async function getElectricity() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
         const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
+        
+        // Kasutame ühte stabiilset proxyt
+        const proxy = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
 
-        const proxy1 = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
-        const proxy2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`;
-
-        let rawData = null;
         try {
-            const r = await fetch(proxy1);
-            if(r.ok) { const j = await r.json(); rawData = j.data.ee; } else throw new Error();
-        } catch (e) {
-            try {
-                const r2 = await fetch(proxy2);
-                if(r2.ok) { const j2 = await r2.json(); rawData = j2.data.ee; }
-            } catch (e2) {
-                document.getElementById('loader').innerText = "Viga ühenduses.";
-                return;
+            const r = await fetch(proxy);
+            if(r.ok) { 
+                const j = await r.json(); 
+                processElectricity(j.data.ee);
+                // Salvesta cache
+                localStorage.setItem('elekter_data', JSON.stringify(j.data.ee));
+                localStorage.setItem('elekter_time', Date.now());
             }
+        } catch (e) { console.error("Netiviga, kasutan vana infot kui on"); }
+    }
+
+    function loadCache() {
+        const cached = localStorage.getItem('elekter_data');
+        if(cached) {
+            console.log("Loading from cache...");
+            processElectricity(JSON.parse(cached));
         }
-        if(rawData) processElectricity(rawData);
     }
 
     function processElectricity(data) {
+        // Jagame andmed
         const todayStr = new Date().toDateString();
         const tmrwStr = new Date(new Date().setDate(new Date().getDate() + 1)).toDateString();
 
         appData.today = data.filter(d => new Date(d.timestamp*1000).toDateString() === todayStr);
         appData.tomorrow = data.filter(d => new Date(d.timestamp*1000).toDateString() === tmrwStr);
-
-        document.getElementById('loader').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
+        appData.all = [...appData.today, ...appData.tomorrow]; // Ühendatud massiiv kalkulaatorile
 
         updateHero();
+        renderClock();
+        calcSmartCharge(); // Uus funktsioon!
         renderChart();
-        updateLists('today');
-        calc();
+        updateLists();
     }
 
+    // --- LOGIC ---
     function updateHero() {
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
         const curr = appData.today.find(d => d.timestamp === nowTs);
@@ -303,72 +371,150 @@
         card.classList.remove('effect-aurora', 'effect-pulse');
 
         if(curr) {
-            const price = (curr.price / 10 * VAT);
-            appData.currentPrice = price;
+            const price = (curr.price / 10 * settings.vat);
             priceEl.innerText = price.toFixed(2);
-            
-            const d = new Date(curr.timestamp*1000);
-            const h = d.getHours().toString().padStart(2,'0');
-            const hNext = (d.getHours()+1).toString().padStart(2,'0');
-            document.getElementById('current-time').innerText = `${h}:00 – ${hNext}:00`;
+            document.getElementById('current-time').innerText = new Date().getHours() + ":00 – " + (new Date().getHours()+1) + ":00";
+            document.getElementById('clock-now-val').innerText = price.toFixed(1);
 
-            if(price < LOW_PRICE) {
+            if(price < settings.lowPrice) {
                 card.classList.add('effect-aurora');
                 priceEl.style.color = '#2E7D32'; 
-            } else if (price > HIGH_PRICE) {
+            } else if (price > settings.highPrice) {
                 card.classList.add('effect-pulse');
                 priceEl.style.color = '#D32F2F'; 
             } else {
-                priceEl.style.color = '#1d1d1f';
+                priceEl.style.color = 'var(--text)';
+            }
+        }
+    }
+
+    // --- 24H KELL (CANVAS) ---
+    function renderClock() {
+        const canvas = document.getElementById('clock-canvas');
+        const ctx = canvas.getContext('2d');
+        // Reso parandamine
+        const dpr = window.devicePixelRatio || 1;
+        const size = 220;
+        canvas.width = size * dpr; canvas.height = size * dpr;
+        ctx.scale(dpr, dpr);
+
+        const centerX = size/2; const centerY = size/2;
+        const radius = size/2 - 10;
+        const segmentAngle = (2 * Math.PI) / 24;
+
+        ctx.clearRect(0, 0, size, size);
+
+        // Joonista 24 segmenti
+        appData.today.forEach(item => {
+            const date = new Date(item.timestamp * 1000);
+            const hour = date.getHours();
+            const price = (item.price / 10 * settings.vat);
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, hour * segmentAngle, (hour + 1) * segmentAngle);
+            ctx.closePath();
+
+            // Värv
+            if(price < settings.lowPrice) ctx.fillStyle = '#4CAF50';
+            else if(price > settings.highPrice) ctx.fillStyle = '#FF3B30';
+            else ctx.fillStyle = '#e0e0e0'; // Neutraalne
+            
+            // Kui on praegune tund, tee erksamaks/suuremaks
+            if(hour === new Date().getHours()) {
+                ctx.fillStyle = '#2196F3'; // Sinine hetk
+            }
+            
+            ctx.fill();
+            ctx.strokeStyle = document.body.style.backgroundColor; 
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+
+        // Keskmine auk (Donut)
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card');
+        ctx.fill();
+    }
+
+    // --- SMART CHARGE (TARK LAADIJA) ---
+    function calcSmartCharge() {
+        const duration = parseInt(document.getElementById('charge-slider').value);
+        document.getElementById('charge-duration-lbl').innerText = duration;
+
+        // Otsime parimat aega tulevikust (tänasest hetkest kuni homse lõpuni)
+        const nowTs = Math.floor(Date.now()/1000/3600)*3600;
+        // Filtreeri välja möödunud tunnid
+        const futureData = appData.all.filter(d => d.timestamp >= nowTs);
+
+        if(futureData.length < duration) {
+            document.getElementById('best-charge-time').innerText = "Andmed puuduvad";
+            return;
+        }
+
+        let bestAvg = Infinity;
+        let bestStartItem = null;
+
+        // Libisev aken (Moving Average)
+        for(let i=0; i <= futureData.length - duration; i++) {
+            let sum = 0;
+            for(let j=0; j<duration; j++) {
+                sum += futureData[i+j].price;
+            }
+            let avg = sum / duration;
+            if(avg < bestAvg) {
+                bestAvg = avg;
+                bestStartItem = futureData[i];
             }
         }
 
-        const avgToday = getAvg(appData.today);
-        document.getElementById('avg-today').innerText = avgToday;
+        if(bestStartItem) {
+            const d = new Date(bestStartItem.timestamp * 1000);
+            const price = (bestAvg / 10 * settings.vat).toFixed(2);
+            
+            let dayText = "Täna";
+            if(d.getDate() !== new Date().getDate()) dayText = "Homme";
 
-        if(appData.tomorrow.length > 0) {
-            const avgTom = getAvg(appData.tomorrow);
-            document.getElementById('avg-tomorrow').innerText = avgTom;
-            const diff = ((avgTom - avgToday) / avgToday * 100).toFixed(0);
-            const tag = document.getElementById('diff-tag');
-            tag.classList.remove('hidden');
-            tag.innerText = (diff > 0 ? "+" : "") + diff + "%";
-            tag.className = diff > 0 ? "diff-tag diff-up" : "diff-tag diff-down";
-        } else {
-            document.getElementById('avg-tomorrow').innerText = "-";
+            document.getElementById('best-charge-time').innerText = `${dayText} kell ${d.getHours()}:00`;
+            document.getElementById('charge-avg-price').innerText = `Keskmine hind: ${price} s/kWh`;
         }
     }
 
-    function getAvg(arr) {
-        if(!arr.length) return 0;
-        const sum = arr.reduce((acc, i) => acc + (i.price/10*VAT), 0);
-        return (sum / arr.length).toFixed(2);
+    // --- ILM & PÄIKE ---
+    async function getWeather() {
+        try {
+            const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=57.848&longitude=27.014&current=temperature_2m,wind_speed_10m,cloud_cover,is_day");
+            const j = await r.json();
+            const curr = j.current;
+            
+            document.getElementById('w-temp').innerText = Math.round(curr.temperature_2m) + "°";
+            document.getElementById('w-wind').innerText = Math.round(curr.wind_speed_10m / 3.6) + " m/s"; // kmh -> ms
+
+            // Päikese loogika
+            let solarText = "Madal";
+            let solarIcon = "☁️";
+            
+            // Kui on päev JA vähe pilvi
+            if (curr.is_day === 1) {
+                if (curr.cloud_cover < 30) { solarText = "Kõrge!"; solarIcon = "☀️"; }
+                else if (curr.cloud_cover < 70) { solarText = "Keskmine"; solarIcon = "⛅"; }
+            } else {
+                solarText = "Öö"; solarIcon = "🌙";
+            }
+            
+            document.getElementById('w-solar').innerText = solarText;
+            document.getElementById('w-solar-icon').innerText = solarIcon;
+
+        } catch(e) {}
     }
 
-    function updateLists(day) {
-        const data = day === 'today' ? appData.today : appData.tomorrow;
-        if(!data.length) return;
-        const sorted = [...data].sort((a,b) => a.price - b.price);
-        const cheap = sorted.slice(0,3);
-        const exp = sorted.slice(-3).reverse();
-        const render = (arr, elId, isGood) => {
-            const el = document.getElementById(elId);
-            el.innerHTML = arr.map(i => {
-                const p = (i.price/10*VAT).toFixed(1);
-                const d = new Date(i.timestamp*1000);
-                const h = d.getHours().toString().padStart(2,'0');
-                const cls = isGood ? 'price-good' : 'price-bad';
-                return `<div class="item-row"><span>${h}:00–${(d.getHours()+1).toString().padStart(2,'0')}</span><span class="${cls}">${p} s</span></div>`;
-            }).join('');
-        };
-        render(cheap, 'list-cheap', true);
-        render(exp, 'list-expensive', false);
-    }
-
+    // --- GRAAFIK ---
     function renderChart() {
         const mode = document.getElementById('day-select').value;
         let data = mode === 'today' ? appData.today : appData.tomorrow;
         
+        // Filtreeri minevik välja, kui "Täna"
         if (mode === 'today') {
             const currentH = new Date().getHours();
             data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH);
@@ -381,20 +527,24 @@
         } else {
             document.getElementById('priceChart').style.display = 'block';
             document.getElementById('no-data-msg').classList.add('hidden');
-            updateLists(mode);
         }
 
         const ctx = document.getElementById('priceChart').getContext('2d');
         const labels = data.map(d => new Date(d.timestamp*1000).getHours());
-        const values = data.map(d => parseFloat((d.price/10*VAT).toFixed(2)));
+        const values = data.map(d => parseFloat((d.price/10*settings.vat).toFixed(2)));
         
-        const dayFullData = mode === 'today' ? appData.today : appData.tomorrow;
-        const avg = parseFloat(getAvg(dayFullData));
-
         if(chartInstance) chartInstance.destroy();
 
+        // Värvi muutuv joon
+        const segmentColor = ctx => {
+            const v = ctx.p0.parsed.y;
+            if(v < settings.lowPrice) return '#4CAF50';
+            if(v > settings.highPrice) return '#FF3B30';
+            return '#FF9500'; // Keskmine (kollane/oranž)
+        };
+
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
+        gradient.addColorStop(0, 'rgba(76, 175, 80, 0.2)');
         gradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
 
         chartInstance = new Chart(ctx, {
@@ -404,96 +554,110 @@
                 datasets: [{
                     label: 'Hind',
                     data: values,
-                    borderColor: '#4CAF50',
-                    backgroundColor: gradient,
-                    borderWidth: 2,
+                    borderWidth: 3,
                     stepped: true,
                     fill: true,
+                    backgroundColor: gradient,
+                    segment: { borderColor: ctx => segmentColor(ctx) },
                     pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, 
                     pointBackgroundColor: '#4CAF50',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointHoverRadius: 6,
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { display: false },
-                    annotation: {
-                        annotations: {
-                            line1: {
-                                type: 'line', yMin: avg, yMax: avg,
-                                borderColor: 'rgba(0,0,0,0.3)', borderDash: [5,5], borderWidth: 2,
-                                label: { display: true, content: 'Keskmine', position: 'end', color: '#888', font: {size:10} }
-                            }
-                        }
-                    },
-                    tooltip: { callbacks: { label: (c) => `Hind: ${c.raw} s/kWh` } }
-                },
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Hind: ${c.raw} s` } } },
                 scales: {
-                    x: { 
-                        grid: { display:false },
-                        // --- PARANDUS: KELLAAJAD KORDA ---
-                        ticks: { 
-                            maxTicksLimit: 8, // Näita vähem kellaaegu, et ei kattuks
-                            autoSkip: true,   // Peida automaatselt vahepealsed
-                            maxRotation: 0,   // Hoia horisontaalselt
-                            font: {size: 11},
-                            color: '#8e8e93'
-                        }
-                    },
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
+                    x: { grid: { display:false }, ticks: { maxTicksLimit: 8, autoSkip: true, maxRotation: 0 } },
+                    y: { beginAtZero: true, grid: { color: getComputedStyle(document.body).getPropertyValue('--chart-grid') } }
                 }
             }
         });
+        updateLists();
     }
 
-    async function getWeather() {
-        try {
-            const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=57.848&longitude=27.014&current=temperature_2m,weather_code,wind_speed_10m");
-            const j = await r.json();
-            const curr = j.current;
-            const temp = curr.temperature_2m;
-            const wind = curr.wind_speed_10m;
-            let hint = "";
-            if(wind > 20) hint = "🌪 Tugev tuul – see surub tavaliselt elektrihinda alla!";
-            else if(temp < -10) hint = "❄️ Külm ilm tõstab tavaliselt tarbimist ja hinda.";
-            else if(wind < 5 && temp < 5) hint = "Vähe tuult ja jahe – hinnad võivad olla kõrgemad.";
-            else hint = "Ilm on stabiilne.";
-
-            document.getElementById('weather-box').innerHTML = `
-                <div class="weather-row">
-                    <div class="w-text" style="display:flex; align-items:center; gap:5px;"><span style="font-size:20px;">🌡️</span> ${temp}°C</div>
-                    <div class="w-text" style="display:flex; align-items:center; gap:5px;"><span style="font-size:20px;">💨</span> ${wind} km/h</div>
-                </div>
-                <div class="w-hint">💡 ${hint}</div>
-            `;
-        } catch(e) { document.getElementById('weather-box').innerText = "Ilma info ei lae"; }
+    function updateLists() {
+        // Kasutame tänase päeva andmeid
+        const data = appData.today;
+        if(!data.length) return;
+        const sorted = [...data].sort((a,b) => a.price - b.price);
+        
+        const render = (arr, elId, color) => {
+            document.getElementById(elId).innerHTML = arr.map(i => {
+                const p = (i.price/10*settings.vat).toFixed(1);
+                const h = new Date(i.timestamp*1000).getHours().toString().padStart(2,'0');
+                return `<div class="item-row"><span>${h}:00</span><span style="color:${color}; font-weight:700;">${p} s</span></div>`;
+            }).join('');
+        };
+        render(sorted.slice(0,3), 'list-cheap', 'var(--primary)');
+        render(sorted.slice(-3).reverse(), 'list-expensive', 'var(--danger)');
     }
 
-    function setWatts(w) { document.getElementById('watts').value = w; calc(); }
-    function calc() {
-        const w = document.getElementById('watts').value;
-        const price = appData.currentPrice;
-        if(price) {
-            const cost = (w/1000 * price).toFixed(2);
-            document.getElementById('calc-result').innerHTML = `Kulu hetkel: <span style="color:var(--primary)">${cost} senti</span> / tund`;
+    // --- SETTINGS ---
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function saveSettings() {
+        settings.vat = parseFloat(document.getElementById('set-vat').value) / 100 + 1;
+        settings.lowPrice = parseFloat(document.getElementById('set-low').value);
+        settings.highPrice = parseFloat(document.getElementById('set-high').value);
+        
+        localStorage.setItem('user_settings', JSON.stringify(settings));
+        
+        document.getElementById('settings-modal').style.display = 'none';
+        document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
+        
+        // Re-render everything
+        updateHero();
+        renderClock();
+        renderChart();
+        calcSmartCharge();
+        updateLists();
+    }
+
+    function loadSettings() {
+        const saved = localStorage.getItem('user_settings');
+        if(saved) {
+            const s = JSON.parse(saved);
+            // Taasta väärtused
+            document.getElementById('set-vat').value = Math.round((s.vat - 1) * 100);
+            document.getElementById('set-low').value = s.lowPrice;
+            document.getElementById('set-high').value = s.highPrice;
+            document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
+            settings = s;
+            
+            if(settings.theme) applyTheme(settings.theme);
         }
     }
 
-    function toggleNotify() {
-        if (!("Notification" in window)) return alert("Brauser ei toeta seda.");
-        Notification.requestPermission().then(p => {
-            if(p === "granted") { notifyEnabled = true; updateNotifyBtn(); }
-        });
+    // --- DARK MODE ---
+    function toggleTheme() {
+        if(settings.theme === 'auto') settings.theme = 'dark';
+        else if(settings.theme === 'dark') settings.theme = 'light';
+        else settings.theme = 'auto';
+        applyTheme();
     }
-    function updateNotifyBtn() {
-        const b = document.getElementById('btn-notify');
-        if(notifyEnabled) { b.innerText = "Teavitused aktiivsed ✅"; b.classList.add('active'); }
+
+    function applyTheme() {
+        const btn = document.getElementById('theme-toggle-btn');
+        const root = document.documentElement;
+        
+        if (settings.theme === 'auto') {
+            btn.innerText = "Auto";
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                root.setAttribute('data-theme', 'dark');
+            } else {
+                root.removeAttribute('data-theme');
+            }
+        } else if (settings.theme === 'dark') {
+            btn.innerText = "Tume";
+            root.setAttribute('data-theme', 'dark');
+        } else {
+            btn.innerText = "Hele";
+            root.removeAttribute('data-theme');
+        }
     }
+
 </script>
 </body>
 </html>
