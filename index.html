@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nutikas Elekter v5</title>
+    <title>Nutikas Elekter v6</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -240,7 +240,7 @@
 
     <div class="last-update" id="last-update-text"></div>
     <div style="text-align:center; color:var(--muted); font-size:11px; margin-top:5px; margin-bottom:20px;">
-        v5.0 Ultimate • Cache Enabled
+        v6.0 Robust
     </div>
 
 </div>
@@ -279,10 +279,10 @@
         vat: 1.24,
         lowPrice: 5,
         highPrice: 15,
-        theme: 'auto' // 'auto', 'dark', 'light'
+        theme: 'auto' 
     };
 
-    let appData = { today: [], tomorrow: [], all: [] }; // all: today + tomorrow for calc
+    let appData = { today: [], tomorrow: [], all: [] };
     let chartInstance = null;
     let clockInstance = null;
     let lastLoadedHour = -1;
@@ -291,14 +291,9 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadSettings();
         applyTheme();
-        
-        // 1. Proovi laadida vahemälust (Instant Load)
         loadCache();
-
-        // 2. Värskenda andmeid taustal
         init();
 
-        // Auto-refresh triggers
         document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkAndReload(); });
         setInterval(checkAndReload, 60000);
     });
@@ -315,48 +310,78 @@
         document.getElementById('last-update-text').innerText = "Värskendatud: " + new Date().toLocaleTimeString();
     }
 
-    // --- DATA FETCHING & CACHING ---
+    // --- DATA FETCHING (MULTI-PROXY) ---
     async function getElectricity() {
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
-        const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
-        
-        // Kasutame ühte stabiilset proxyt
-        const proxy = `https://corsproxy.io/?${encodeURIComponent(apiURL)}`;
+        const eleringUrl = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
 
-        try {
-            const r = await fetch(proxy);
-            if(r.ok) { 
-                const j = await r.json(); 
-                processElectricity(j.data.ee);
-                // Salvesta cache
-                localStorage.setItem('elekter_data', JSON.stringify(j.data.ee));
-                localStorage.setItem('elekter_time', Date.now());
+        // PROXY LIST (JÄRJEKORRAS)
+        const proxies = [
+            `https://corsproxy.io/?${encodeURIComponent(eleringUrl)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(eleringUrl)}`,
+            `https://thingproxy.freeboard.io/fetch/${eleringUrl}`
+        ];
+
+        let rawData = null;
+
+        for (const proxy of proxies) {
+            try {
+                console.log("Trying proxy:", proxy);
+                const r = await fetch(proxy);
+                if (r.ok) {
+                    const j = await r.json();
+                    // AllOrigins tagastab mõnikord andmed otse, mõnikord 'contents' sees
+                    if (j.data && j.data.ee) rawData = j.data.ee;
+                    else if (j.contents) {
+                        const parsed = JSON.parse(j.contents);
+                        if (parsed.data && parsed.data.ee) rawData = parsed.data.ee;
+                    }
+                    else if (Array.isArray(j)) rawData = j; // Mõni API võib otse massiivi tagastada
+                    
+                    if (rawData) break; // Õnnestus!
+                }
+            } catch (e) {
+                console.warn("Proxy failed:", proxy, e);
             }
-        } catch (e) { console.error("Netiviga, kasutan vana infot kui on"); }
+        }
+
+        if (rawData) {
+            processElectricity(rawData);
+            localStorage.setItem('elekter_data', JSON.stringify(rawData));
+        } else {
+            console.error("All proxies failed.");
+            // Kui vahemälu on tühi, näita viga
+            if (appData.today.length === 0) {
+                document.getElementById('current-price').innerText = "ERR";
+                document.getElementById('current-price').style.color = "var(--danger)";
+            }
+        }
     }
 
     function loadCache() {
         const cached = localStorage.getItem('elekter_data');
         if(cached) {
-            console.log("Loading from cache...");
-            processElectricity(JSON.parse(cached));
+            try {
+                processElectricity(JSON.parse(cached));
+            } catch(e) { console.log("Cache invalid"); }
         }
     }
 
     function processElectricity(data) {
-        // Jagame andmed
+        if (!data || !Array.isArray(data)) return;
+
         const todayStr = new Date().toDateString();
         const tmrwStr = new Date(new Date().setDate(new Date().getDate() + 1)).toDateString();
 
         appData.today = data.filter(d => new Date(d.timestamp*1000).toDateString() === todayStr);
         appData.tomorrow = data.filter(d => new Date(d.timestamp*1000).toDateString() === tmrwStr);
-        appData.all = [...appData.today, ...appData.tomorrow]; // Ühendatud massiiv kalkulaatorile
+        appData.all = [...appData.today, ...appData.tomorrow]; 
 
         updateHero();
         renderClock();
-        calcSmartCharge(); // Uus funktsioon!
+        calcSmartCharge(); 
         renderChart();
         updateLists();
     }
@@ -388,11 +413,10 @@
         }
     }
 
-    // --- 24H KELL (CANVAS) ---
+    // --- 24H KELL ---
     function renderClock() {
         const canvas = document.getElementById('clock-canvas');
         const ctx = canvas.getContext('2d');
-        // Reso parandamine
         const dpr = window.devicePixelRatio || 1;
         const size = 220;
         canvas.width = size * dpr; canvas.height = size * dpr;
@@ -404,7 +428,6 @@
 
         ctx.clearRect(0, 0, size, size);
 
-        // Joonista 24 segmenti
         appData.today.forEach(item => {
             const date = new Date(item.timestamp * 1000);
             const hour = date.getHours();
@@ -415,37 +438,32 @@
             ctx.arc(centerX, centerY, radius, hour * segmentAngle, (hour + 1) * segmentAngle);
             ctx.closePath();
 
-            // Värv
             if(price < settings.lowPrice) ctx.fillStyle = '#4CAF50';
             else if(price > settings.highPrice) ctx.fillStyle = '#FF3B30';
-            else ctx.fillStyle = '#e0e0e0'; // Neutraalne
+            else ctx.fillStyle = '#e0e0e0'; 
             
-            // Kui on praegune tund, tee erksamaks/suuremaks
             if(hour === new Date().getHours()) {
-                ctx.fillStyle = '#2196F3'; // Sinine hetk
+                ctx.fillStyle = '#2196F3'; 
             }
             
             ctx.fill();
-            ctx.strokeStyle = document.body.style.backgroundColor; 
+            ctx.strokeStyle = getComputedStyle(document.body).backgroundColor; 
             ctx.lineWidth = 2;
             ctx.stroke();
         });
 
-        // Keskmine auk (Donut)
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card');
         ctx.fill();
     }
 
-    // --- SMART CHARGE (TARK LAADIJA) ---
+    // --- SMART CHARGE ---
     function calcSmartCharge() {
         const duration = parseInt(document.getElementById('charge-slider').value);
         document.getElementById('charge-duration-lbl').innerText = duration;
 
-        // Otsime parimat aega tulevikust (tänasest hetkest kuni homse lõpuni)
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
-        // Filtreeri välja möödunud tunnid
         const futureData = appData.all.filter(d => d.timestamp >= nowTs);
 
         if(futureData.length < duration) {
@@ -456,26 +474,17 @@
         let bestAvg = Infinity;
         let bestStartItem = null;
 
-        // Libisev aken (Moving Average)
         for(let i=0; i <= futureData.length - duration; i++) {
             let sum = 0;
-            for(let j=0; j<duration; j++) {
-                sum += futureData[i+j].price;
-            }
+            for(let j=0; j<duration; j++) sum += futureData[i+j].price;
             let avg = sum / duration;
-            if(avg < bestAvg) {
-                bestAvg = avg;
-                bestStartItem = futureData[i];
-            }
+            if(avg < bestAvg) { bestAvg = avg; bestStartItem = futureData[i]; }
         }
 
         if(bestStartItem) {
             const d = new Date(bestStartItem.timestamp * 1000);
             const price = (bestAvg / 10 * settings.vat).toFixed(2);
-            
-            let dayText = "Täna";
-            if(d.getDate() !== new Date().getDate()) dayText = "Homme";
-
+            let dayText = d.getDate() !== new Date().getDate() ? "Homme" : "Täna";
             document.getElementById('best-charge-time').innerText = `${dayText} kell ${d.getHours()}:00`;
             document.getElementById('charge-avg-price').innerText = `Keskmine hind: ${price} s/kWh`;
         }
@@ -489,23 +498,17 @@
             const curr = j.current;
             
             document.getElementById('w-temp').innerText = Math.round(curr.temperature_2m) + "°";
-            document.getElementById('w-wind').innerText = Math.round(curr.wind_speed_10m / 3.6) + " m/s"; // kmh -> ms
+            document.getElementById('w-wind').innerText = Math.round(curr.wind_speed_10m / 3.6) + " m/s";
 
-            // Päikese loogika
             let solarText = "Madal";
             let solarIcon = "☁️";
-            
-            // Kui on päev JA vähe pilvi
             if (curr.is_day === 1) {
                 if (curr.cloud_cover < 30) { solarText = "Kõrge!"; solarIcon = "☀️"; }
                 else if (curr.cloud_cover < 70) { solarText = "Keskmine"; solarIcon = "⛅"; }
-            } else {
-                solarText = "Öö"; solarIcon = "🌙";
-            }
+            } else { solarText = "Öö"; solarIcon = "🌙"; }
             
             document.getElementById('w-solar').innerText = solarText;
             document.getElementById('w-solar-icon').innerText = solarIcon;
-
         } catch(e) {}
     }
 
@@ -514,7 +517,6 @@
         const mode = document.getElementById('day-select').value;
         let data = mode === 'today' ? appData.today : appData.tomorrow;
         
-        // Filtreeri minevik välja, kui "Täna"
         if (mode === 'today') {
             const currentH = new Date().getHours();
             data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH);
@@ -535,12 +537,11 @@
         
         if(chartInstance) chartInstance.destroy();
 
-        // Värvi muutuv joon
         const segmentColor = ctx => {
             const v = ctx.p0.parsed.y;
             if(v < settings.lowPrice) return '#4CAF50';
             if(v > settings.highPrice) return '#FF3B30';
-            return '#FF9500'; // Keskmine (kollane/oranž)
+            return '#FF9500';
         };
 
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -579,7 +580,6 @@
     }
 
     function updateLists() {
-        // Kasutame tänase päeva andmeid
         const data = appData.today;
         if(!data.length) return;
         const sorted = [...data].sort((a,b) => a.price - b.price);
@@ -601,36 +601,25 @@
         settings.vat = parseFloat(document.getElementById('set-vat').value) / 100 + 1;
         settings.lowPrice = parseFloat(document.getElementById('set-low').value);
         settings.highPrice = parseFloat(document.getElementById('set-high').value);
-        
         localStorage.setItem('user_settings', JSON.stringify(settings));
-        
         document.getElementById('settings-modal').style.display = 'none';
         document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
-        
-        // Re-render everything
-        updateHero();
-        renderClock();
-        renderChart();
-        calcSmartCharge();
-        updateLists();
+        updateHero(); renderClock(); renderChart(); calcSmartCharge(); updateLists();
     }
 
     function loadSettings() {
         const saved = localStorage.getItem('user_settings');
         if(saved) {
             const s = JSON.parse(saved);
-            // Taasta väärtused
             document.getElementById('set-vat').value = Math.round((s.vat - 1) * 100);
             document.getElementById('set-low').value = s.lowPrice;
             document.getElementById('set-high').value = s.highPrice;
             document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
             settings = s;
-            
             if(settings.theme) applyTheme(settings.theme);
         }
     }
 
-    // --- DARK MODE ---
     function toggleTheme() {
         if(settings.theme === 'auto') settings.theme = 'dark';
         else if(settings.theme === 'dark') settings.theme = 'light';
@@ -641,14 +630,10 @@
     function applyTheme() {
         const btn = document.getElementById('theme-toggle-btn');
         const root = document.documentElement;
-        
         if (settings.theme === 'auto') {
             btn.innerText = "Auto";
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                root.setAttribute('data-theme', 'dark');
-            } else {
-                root.removeAttribute('data-theme');
-            }
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) root.setAttribute('data-theme', 'dark');
+            else root.removeAttribute('data-theme');
         } else if (settings.theme === 'dark') {
             btn.innerText = "Tume";
             root.setAttribute('data-theme', 'dark');
@@ -657,7 +642,6 @@
             root.removeAttribute('data-theme');
         }
     }
-
 </script>
 </body>
 </html>
