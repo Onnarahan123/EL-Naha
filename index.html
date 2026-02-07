@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nutikas Elekter v9</title>
+    <title>Nutikas Elekter v11</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,6 +26,8 @@
             --chart-grid: #E5E5EA;
             --clock-gray: #E5E5EA;
             --guru-bg: #F2F2F7;
+            --appliance-bg: rgba(0,0,0,0.03);
+            --slider-track: #E5E5EA; /* Hele vaikimisi */
         }
 
         [data-theme="dark"] {
@@ -38,6 +40,8 @@
             --chart-grid: #2C2C2E;
             --clock-gray: #3A3A3C;
             --guru-bg: #2C2C2E;
+            --appliance-bg: rgba(255,255,255,0.08);
+            --slider-track: #ffffff; /* Tumedas režiimis valge */
         }
 
         body {
@@ -91,7 +95,7 @@
         .hero-price { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text); }
         .hero-unit { font-size: 15px; color: var(--subtext); font-weight: 500; margin-top: 6px; }
 
-        /* ELEKTRI-GURU (UUS!) */
+        /* GURU BUBBLE */
         .guru-bubble {
             background: var(--guru-bg);
             border-radius: 16px;
@@ -107,7 +111,7 @@
         }
         @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* ÜLEVAADE (KELL + ILM) */
+        /* ÜHENDATUD ÜLEVAADE */
         .clock-weather-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .clock-container { position: relative; width: 200px; height: 200px; }
         #clock-canvas { width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -122,6 +126,24 @@
         .wm-val { font-size: 13px; font-weight: 700; color: var(--text); }
         .wm-lbl { font-size: 10px; color: var(--subtext); text-transform: uppercase; font-weight: 600; }
 
+        /* KODUMASINATE MAATRIKS */
+        .appliance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .app-item { 
+            background: var(--appliance-bg); 
+            padding: 12px; 
+            border-radius: 16px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            position: relative;
+        }
+        .app-icon { font-size: 24px; margin-bottom: 5px; }
+        .app-name { font-size: 11px; font-weight: 600; color: var(--subtext); text-transform: uppercase; margin-bottom: 2px; }
+        .app-cost { font-size: 16px; font-weight: 700; color: var(--text); }
+        .app-best { font-size: 10px; color: var(--primary); margin-top: 2px; font-weight: 600; }
+        .app-badge-expensive { color: var(--danger); }
+        
         /* GRAAFIK */
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .chart-box { height: 260px; width: 100%; position: relative; }
@@ -132,17 +154,10 @@
         .slider-container { width: 100%; margin-bottom: 20px; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--card); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: -10px; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--chart-grid); border-radius: 2px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--slider-track); border-radius: 2px; }
         .charge-result { text-align: center; padding: 15px; background: rgba(76, 175, 80, 0.08); border-radius: 16px; border: 1px solid rgba(76, 175, 80, 0.2); }
         .charge-time { font-size: 18px; font-weight: 700; color: var(--primary); display: block; margin-bottom: 2px; }
         .charge-saving { font-size: 12px; color: var(--subtext); }
-
-        /* LISTID */
-        .list-row { display: flex; gap: 15px; }
-        .list-col { flex: 1; }
-        .list-header { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; }
-        .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
-        .item-row:last-child { border-bottom: none; }
 
         h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--subtext); margin: 0 0 15px 0; letter-spacing: 1px; }
         .hidden { display: none !important; }
@@ -150,7 +165,7 @@
 
         /* MODAL */
         #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; align-items: flex-end; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--modal-bg); width: 100%; border-radius: 24px 24px 0 0; padding: 30px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .modal-content { background: var(--modal-bg); width: 100%; border-radius: 24px 24px 0 0; padding: 30px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
         .setting-input { width: 70px; padding: 8px; border-radius: 10px; border: none; background: rgba(142,142,147,0.15); text-align: center; font-size: 16px; color: var(--text); font-weight: 600; }
@@ -173,8 +188,37 @@
             <div id="current-time" class="hero-time">--:--</div>
             <div id="current-price" class="hero-price">--</div>
             <div class="hero-unit">senti / kWh (KM <span id="vat-display">24</span>%)</div>
-            
-            <div class="guru-bubble" id="guru-text">Laen soovitust...</div>
+            <div class="guru-bubble" id="guru-text">...</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Kodumasinate kulu hetkel</h2>
+        <div class="appliance-grid">
+            <div class="app-item">
+                <span class="app-icon">🧖‍♂️</span>
+                <span class="app-name">Saun (3h)</span>
+                <span class="app-cost" id="cost-sauna">--</span>
+                <span class="app-best" id="best-sauna">--</span>
+            </div>
+            <div class="app-item">
+                <span class="app-icon">🧺</span>
+                <span class="app-name">Pesu & Kuivati</span>
+                <span class="app-cost" id="cost-wash">--</span>
+                <span class="app-best" id="best-wash">--</span>
+            </div>
+            <div class="app-item">
+                <span class="app-icon">🍳</span>
+                <span class="app-name">Pliit/Ahi (1h)</span>
+                <span class="app-cost" id="cost-stove">--</span>
+                <span class="app-best" id="best-stove">--</span>
+            </div>
+            <div class="app-item">
+                <span class="app-icon">🚗</span>
+                <span class="app-name">Auto (4h)</span>
+                <span class="app-cost" id="cost-car">--</span>
+                <span class="app-best" id="best-car">--</span>
+            </div>
         </div>
     </div>
 
@@ -188,23 +232,10 @@
                     <div class="clock-unit">s/kWh</div>
                 </div>
             </div>
-            
             <div class="weather-mini-row">
-                <div class="wm-item">
-                    <span class="wm-icon">🌡️</span>
-                    <span class="wm-val" id="w-temp">--°</span>
-                    <span class="wm-lbl">Temp</span>
-                </div>
-                <div class="wm-item">
-                    <span class="wm-icon">💨</span>
-                    <span class="wm-val" id="w-wind">--</span>
-                    <span class="wm-lbl">Tuul</span>
-                </div>
-                <div class="wm-item">
-                    <span class="wm-icon" id="w-solar-icon">☀️</span>
-                    <span class="wm-val" id="w-solar">--</span>
-                    <span class="wm-lbl">Päike</span>
-                </div>
+                <div class="wm-item"><span class="wm-icon">🌡️</span><span class="wm-val" id="w-temp">--°</span><span class="wm-lbl">Temp</span></div>
+                <div class="wm-item"><span class="wm-icon">💨</span><span class="wm-val" id="w-wind">--</span><span class="wm-lbl">Tuul</span></div>
+                <div class="wm-item"><span class="wm-icon" id="w-solar-icon">☀️</span><span class="wm-val" id="w-solar">--</span><span class="wm-lbl">Päike</span></div>
             </div>
         </div>
     </div>
@@ -238,21 +269,8 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="list-row">
-            <div class="list-col">
-                <div class="list-header">🟢 SOODNE</div>
-                <div id="list-cheap"></div>
-            </div>
-            <div class="list-col">
-                <div class="list-header" style="color:var(--danger)">🔴 KALLIS</div>
-                <div id="list-expensive"></div>
-            </div>
-        </div>
-    </div>
-
     <div style="text-align:center; color:var(--subtext); font-size:10px; margin-top:20px;">
-        <span id="last-update-text"></span> • v9.0 Elektri-Guru
+        <span id="last-update-text"></span> • v11.0 Clean
     </div>
 
 </div>
@@ -260,22 +278,10 @@
 <div id="settings-modal">
     <div class="modal-content">
         <h2 style="font-size:18px; color:var(--text); margin-bottom:25px; border-bottom:none;">Sätted</h2>
-        <div class="setting-row">
-            <span>Tume režiim</span>
-            <button class="toggle-day" onclick="toggleTheme()" id="theme-toggle-btn">Auto</button>
-        </div>
-        <div class="setting-row">
-            <span>Käibemaks (%)</span>
-            <input type="number" id="set-vat" class="setting-input" value="24">
-        </div>
-        <div class="setting-row">
-            <span>Odava piir (s/kWh)</span>
-            <input type="number" id="set-low" class="setting-input" value="5">
-        </div>
-        <div class="setting-row">
-            <span>Kalli piir (s/kWh)</span>
-            <input type="number" id="set-high" class="setting-input" value="15">
-        </div>
+        <div class="setting-row"><span>Tume režiim</span><button class="toggle-day" onclick="toggleTheme()" id="theme-toggle-btn">Auto</button></div>
+        <div class="setting-row"><span>Käibemaks (%)</span><input type="number" id="set-vat" class="setting-input" value="24"></div>
+        <div class="setting-row"><span>Odava piir (s/kWh)</span><input type="number" id="set-low" class="setting-input" value="5"></div>
+        <div class="setting-row"><span>Kalli piir (s/kWh)</span><input type="number" id="set-high" class="setting-input" value="15"></div>
         <button class="close-btn" onclick="saveSettings()">Valmis</button>
     </div>
 </div>
@@ -283,23 +289,19 @@
 <script>
     let settings = { vat: 1.24, lowPrice: 5, highPrice: 15, theme: 'auto' };
     let appData = { today: [], tomorrow: [], all: [], todayAvg: 0 };
-    let weatherInfo = { wind: 0, temp: 0 }; // Uus: ilma andmete hoidmiseks
+    let weatherInfo = { wind: 0, temp: 0 };
     let chartInstance = null;
     let lastLoadedHour = -1;
 
     document.addEventListener("DOMContentLoaded", () => {
-        loadSettings();
-        applyTheme();
-        loadCache();
-        init();
+        loadSettings(); applyTheme(); loadCache(); init();
         document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkAndReload(); });
         setInterval(checkAndReload, 60000);
     });
 
     function checkAndReload() {
         const h = new Date().getHours();
-        if (lastLoadedHour !== -1 && h !== lastLoadedHour) window.location.reload(); 
-        else getElectricity();
+        if (lastLoadedHour !== -1 && h !== lastLoadedHour) window.location.reload(); else getElectricity();
     }
 
     async function init() {
@@ -313,7 +315,6 @@
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2).toISOString();
         const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
-        
         const proxies = [`https://corsproxy.io/?${encodeURIComponent(apiURL)}`, `https://api.allorigins.win/raw?url=${encodeURIComponent(apiURL)}`];
 
         let rawData = null;
@@ -327,11 +328,7 @@
                 }
             } catch (e) {}
         }
-
-        if (rawData) {
-            processElectricity(rawData);
-            localStorage.setItem('elekter_data', JSON.stringify(rawData));
-        }
+        if (rawData) { processElectricity(rawData); localStorage.setItem('elekter_data', JSON.stringify(rawData)); }
     }
 
     function loadCache() {
@@ -353,28 +350,70 @@
         document.getElementById('main-content').classList.remove('hidden');
 
         updateHero();
+        updateAppliancesMatrix(); 
         renderClock();
         calcSmartCharge(); 
         renderChart();
-        updateLists();
     }
 
-    // --- UUS: ELEKTRI-GURU LOOGIKA ---
+    // --- KODUMASINAD (UUENDATUD) ---
+    function updateAppliancesMatrix() {
+        const devices = [
+            { id: 'sauna', kw: 9, hours: 3 },
+            { id: 'wash', kw: 2.5, hours: 3 }, // Pesu + Kuivati (raskem tsükkel)
+            { id: 'stove', kw: 2, hours: 1 },  // Pliit (1h kokkamist)
+            { id: 'car', kw: 11, hours: 4 }
+        ];
+
+        devices.forEach(dev => {
+            const costEl = document.getElementById(`cost-${dev.id}`);
+            const bestEl = document.getElementById(`best-${dev.id}`);
+            const nowTs = Math.floor(Date.now()/1000/3600)*3600;
+            const startIndex = appData.all.findIndex(d => d.timestamp === nowTs);
+            
+            if (startIndex !== -1 && startIndex + dev.hours <= appData.all.length) {
+                let sumCurrent = 0;
+                for(let i=0; i<dev.hours; i++) sumCurrent += (appData.all[startIndex + i].price / 10 * settings.vat);
+                const avgCurrent = sumCurrent / dev.hours;
+                const totalCostCurrent = avgCurrent * dev.kw * dev.hours / 100;
+                
+                costEl.innerText = totalCostCurrent.toFixed(2) + "€";
+                
+                if (avgCurrent > settings.highPrice) {
+                    costEl.classList.add('app-badge-expensive');
+                    costEl.style.color = 'var(--danger)';
+                } else {
+                    costEl.classList.remove('app-badge-expensive');
+                    costEl.style.color = 'var(--text)';
+                }
+
+                let minSum = Infinity;
+                for(let i=startIndex; i <= appData.all.length - dev.hours; i++) {
+                    let s = 0;
+                    for(let j=0; j<dev.hours; j++) s += appData.all[i+j].price;
+                    if(s < minSum) minSum = s;
+                }
+                const bestAvg = (minSum / dev.hours) / 10 * settings.vat;
+                const bestCost = bestAvg * dev.kw * dev.hours / 100;
+                
+                if (totalCostCurrent > bestCost * 1.1) bestEl.innerText = `Parim: ${bestCost.toFixed(2)}€`;
+                else bestEl.innerText = "Parim aeg! ✅";
+
+            } else {
+                costEl.innerText = "--";
+            }
+        });
+    }
+
     function updateGuru(price) {
         const el = document.getElementById('guru-text');
         let msg = "";
-        
-        if (price < 1) msg = "Tasuta elekter! 🎉 Küta sauna ja lae autot täiega.";
+        if (price < 1) msg = "Tasuta elekter! 🎉 Küta sauna ja lae autot.";
         else if (price < settings.lowPrice) msg = "Roheline tuli! ✅ Pesumasinad ja boilerid tööle.";
         else if (price > 30) msg = "Röövlite hind! 🤬 Lülita absoluutselt kõik välja!";
         else if (price > settings.highPrice) msg = "Hind on krõbe! 🔴 Lükka tarbimine hilisemaks.";
-        else msg = "Mõistlik hind. 👌 Tarbi rahulikult, aga ära larista.";
-
-        // Lisa ilma kommentaar (kui tuul on tugev)
-        if (weatherInfo.wind > 6 && price < 15) {
-            msg += " (Tuul puhub hinna alla 🌬)";
-        }
-
+        else msg = "Mõistlik hind. 👌 Tarbi rahulikult.";
+        if (weatherInfo.wind > 6 && price < 15) msg += " (Tuul puhub hinna alla 🌬)";
         el.innerText = msg;
     }
 
@@ -383,25 +422,16 @@
         const curr = appData.today.find(d => d.timestamp === nowTs);
         const card = document.getElementById('hero-card');
         const priceEl = document.getElementById('current-price');
-        
         card.classList.remove('effect-aurora', 'effect-pulse');
 
         if(curr) {
             const price = (curr.price / 10 * settings.vat);
             priceEl.innerText = price.toFixed(2);
             document.getElementById('current-time').innerText = new Date().getHours() + ":00 – " + (new Date().getHours()+1) + ":00";
-            
-            updateGuru(price); // KUTSUME GURUT
-
-            if(price < settings.lowPrice) {
-                card.classList.add('effect-aurora');
-                priceEl.style.color = 'var(--primary)'; 
-            } else if (price > settings.highPrice) {
-                card.classList.add('effect-pulse');
-                priceEl.style.color = 'var(--danger)'; 
-            } else {
-                priceEl.style.color = 'var(--text)';
-            }
+            updateGuru(price);
+            if(price < settings.lowPrice) { card.classList.add('effect-aurora'); priceEl.style.color = 'var(--primary)'; } 
+            else if (price > settings.highPrice) { card.classList.add('effect-pulse'); priceEl.style.color = 'var(--danger)'; } 
+            else { priceEl.style.color = 'var(--text)'; }
         }
         document.getElementById('day-avg').innerText = appData.todayAvg;
     }
@@ -419,11 +449,9 @@
         const size = 200;
         canvas.width = size * dpr; canvas.height = size * dpr;
         ctx.scale(dpr, dpr);
-
         const centerX = size/2; const centerY = size/2;
         const radius = size/2 - 10;
         const thickness = 6;
-        
         ctx.clearRect(0, 0, size, size);
 
         appData.today.forEach(item => {
@@ -433,16 +461,12 @@
             const gap = 0.05; 
             const startAngle = (hour * (Math.PI * 2 / 24)) + gap;
             const endAngle = ((hour + 1) * (Math.PI * 2 / 24)) - gap;
-
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-            ctx.lineCap = "round";
-            ctx.lineWidth = thickness;
-
+            ctx.lineCap = "round"; ctx.lineWidth = thickness;
             if(price < settings.lowPrice) ctx.strokeStyle = '#34C759';
             else if(price > settings.highPrice) ctx.strokeStyle = '#FF3B30';
             else ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--clock-gray');
-
             ctx.stroke();
         });
 
@@ -450,11 +474,8 @@
         const angle = (currentH * (Math.PI * 2 / 24)) + (Math.PI / 24); 
         const indicatorX = centerX + (radius - 12) * Math.cos(angle);
         const indicatorY = centerY + (radius - 12) * Math.sin(angle);
-
-        ctx.beginPath();
-        ctx.arc(indicatorX, indicatorY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(indicatorX, indicatorY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.fill();
     }
 
     function calcSmartCharge() {
@@ -463,17 +484,11 @@
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
         const futureData = appData.all.filter(d => d.timestamp >= nowTs);
 
-        if(futureData.length < duration) {
-            document.getElementById('best-charge-time').innerText = "Andmed puuduvad";
-            return;
-        }
+        if(futureData.length < duration) { document.getElementById('best-charge-time').innerText = "Andmed puuduvad"; return; }
 
-        let bestAvg = Infinity;
-        let bestStartItem = null;
-
+        let bestAvg = Infinity; let bestStartItem = null;
         for(let i=0; i <= futureData.length - duration; i++) {
-            let sum = 0;
-            for(let j=0; j<duration; j++) sum += futureData[i+j].price;
+            let sum = 0; for(let j=0; j<duration; j++) sum += futureData[i+j].price;
             let avg = sum / duration;
             if(avg < bestAvg) { bestAvg = avg; bestStartItem = futureData[i]; }
         }
@@ -492,14 +507,10 @@
             const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=57.848&longitude=27.014&current=temperature_2m,wind_speed_10m,cloud_cover,is_day");
             const j = await r.json();
             const curr = j.current;
-            
-            // Salvestame globaalsesse muutujasse guru jaoks
             weatherInfo.temp = curr.temperature_2m;
             weatherInfo.wind = curr.wind_speed_10m / 3.6;
-
             document.getElementById('w-temp').innerText = Math.round(weatherInfo.temp) + "°";
             document.getElementById('w-wind').innerText = Math.round(weatherInfo.wind) + " m/s";
-            
             let solarText = "Madal";
             if (curr.is_day === 1 && curr.cloud_cover < 30) solarText = "Kõrge";
             else if (curr.is_day === 1 && curr.cloud_cover < 70) solarText = "Keskm.";
@@ -511,12 +522,10 @@
     function renderChart() {
         const mode = document.getElementById('day-select').value;
         let data = mode === 'today' ? appData.today : appData.tomorrow;
-        
         if (mode === 'today') {
             const currentH = new Date().getHours();
             data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH);
         }
-
         if(!data.length) {
             document.getElementById('priceChart').style.display = 'none';
             document.getElementById('no-data-msg').classList.remove('hidden');
@@ -534,62 +543,26 @@
 
         const textColor = getComputedStyle(document.body).getPropertyValue('--subtext');
         const gridColor = getComputedStyle(document.body).getPropertyValue('--chart-grid');
-
-        const segmentColor = ctx => {
-            const v = ctx.p0.parsed.y;
-            if(v < settings.lowPrice) return '#34C759';
-            if(v > settings.highPrice) return '#FF3B30';
-            return '#FF9500';
-        };
-
+        const segmentColor = ctx => { const v = ctx.p0.parsed.y; if(v < settings.lowPrice) return '#4CAF50'; if(v > settings.highPrice) return '#FF3B30'; return '#FF9500'; };
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(52, 199, 89, 0.2)');
-        gradient.addColorStop(1, 'rgba(52, 199, 89, 0.0)');
+        gradient.addColorStop(0, 'rgba(52, 199, 89, 0.2)'); gradient.addColorStop(1, 'rgba(52, 199, 89, 0.0)');
 
         chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Hind',
-                    data: values,
-                    borderWidth: 3,
-                    stepped: true,
-                    fill: true,
-                    backgroundColor: gradient,
+                    label: 'Hind', data: values, borderWidth: 3, stepped: true, fill: true, backgroundColor: gradient,
                     segment: { borderColor: ctx => segmentColor(ctx) },
-                    pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, 
-                    pointBackgroundColor: '#34C759',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
+                    pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, pointBackgroundColor: '#34C759', pointBorderColor: '#fff', pointBorderWidth: 2,
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Hind: ${c.raw} s` } } },
-                scales: {
-                    x: { grid: { display:false }, ticks: { maxTicksLimit: 8, autoSkip: true, maxRotation: 0, color: textColor } },
-                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }
-                }
+                scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 8, autoSkip: true, maxRotation: 0, color: textColor } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } } }
             }
         });
-    }
-
-    function updateLists() {
-        const data = appData.today;
-        if(!data.length) return;
-        const sorted = [...data].sort((a,b) => a.price - b.price);
-        
-        const render = (arr, elId, color) => {
-            document.getElementById(elId).innerHTML = arr.map(i => {
-                const p = (i.price/10*settings.vat).toFixed(1);
-                const h = new Date(i.timestamp*1000).getHours().toString().padStart(2,'0');
-                return `<div class="item-row"><span>${h}:00</span><span style="color:${color}; font-weight:700;">${p} s</span></div>`;
-            }).join('');
-        };
-        render(sorted.slice(0,3), 'list-cheap', 'var(--primary)');
-        render(sorted.slice(-3).reverse(), 'list-expensive', 'var(--danger)');
     }
 
     function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
@@ -602,7 +575,6 @@
         document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
         processElectricity(appData.all);
     }
-
     function loadSettings() {
         const saved = localStorage.getItem('user_settings');
         if(saved) {
@@ -615,28 +587,13 @@
             if(settings.theme) applyTheme();
         }
     }
-
-    function toggleTheme() {
-        if(settings.theme === 'auto') settings.theme = 'dark';
-        else if(settings.theme === 'dark') settings.theme = 'light';
-        else settings.theme = 'auto';
-        applyTheme();
-    }
-
+    function toggleTheme() { settings.theme = (settings.theme === 'auto') ? 'dark' : (settings.theme === 'dark' ? 'light' : 'auto'); applyTheme(); }
     function applyTheme() {
         const btn = document.getElementById('theme-toggle-btn');
         const root = document.documentElement;
-        if (settings.theme === 'auto') {
-            btn.innerText = "Auto";
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) root.setAttribute('data-theme', 'dark');
-            else root.removeAttribute('data-theme');
-        } else if (settings.theme === 'dark') {
-            btn.innerText = "Tume";
-            root.setAttribute('data-theme', 'dark');
-        } else {
-            btn.innerText = "Hele";
-            root.removeAttribute('data-theme');
-        }
+        if (settings.theme === 'auto') { btn.innerText = "Auto"; if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme'); } 
+        else if (settings.theme === 'dark') { btn.innerText = "Tume"; root.setAttribute('data-theme', 'dark'); } 
+        else { btn.innerText = "Hele"; root.removeAttribute('data-theme'); }
         if(appData.today.length > 0) { renderClock(); renderChart(); }
     }
 </script>
