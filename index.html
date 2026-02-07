@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nutikas Elekter v11</title>
+    <title>Nutikas Elekter v12</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,7 +27,8 @@
             --clock-gray: #E5E5EA;
             --guru-bg: #F2F2F7;
             --appliance-bg: rgba(0,0,0,0.03);
-            --slider-track: #E5E5EA; /* Hele vaikimisi */
+            --slider-track: #E5E5EA;
+            --info-box-bg: #F2F2F7;
         }
 
         [data-theme="dark"] {
@@ -41,7 +42,8 @@
             --clock-gray: #3A3A3C;
             --guru-bg: #2C2C2E;
             --appliance-bg: rgba(255,255,255,0.08);
-            --slider-track: #ffffff; /* Tumedas režiimis valge */
+            --slider-track: #ffffff;
+            --info-box-bg: #2C2C2E;
         }
 
         body {
@@ -126,7 +128,12 @@
         .wm-val { font-size: 13px; font-weight: 700; color: var(--text); }
         .wm-lbl { font-size: 10px; color: var(--subtext); text-transform: uppercase; font-weight: 600; }
 
-        /* KODUMASINATE MAATRIKS */
+        /* GRAAFIK */
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .chart-box { height: 260px; width: 100%; position: relative; }
+        .toggle-day { background: rgba(142, 142, 147, 0.15); border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
+
+        /* KODUMASINATE MAATRIKS (INTERAKTIIVNE) */
         .appliance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
         .app-item { 
             background: var(--appliance-bg); 
@@ -137,18 +144,32 @@
             align-items: center; 
             text-align: center; 
             position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
         }
+        .app-item:active { transform: scale(0.98); }
+        .app-item.selected { border-color: var(--primary); background: rgba(52, 199, 89, 0.05); }
         .app-icon { font-size: 24px; margin-bottom: 5px; }
         .app-name { font-size: 11px; font-weight: 600; color: var(--subtext); text-transform: uppercase; margin-bottom: 2px; }
         .app-cost { font-size: 16px; font-weight: 700; color: var(--text); }
         .app-best { font-size: 10px; color: var(--primary); margin-top: 2px; font-weight: 600; }
         .app-badge-expensive { color: var(--danger); }
-        
-        /* GRAAFIK */
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .chart-box { height: 260px; width: 100%; position: relative; }
-        .toggle-day { background: rgba(142, 142, 147, 0.15); border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
 
+        /* UUS: KODUMASINA INFO BOX */
+        #app-info-box {
+            margin-top: 15px;
+            background: var(--info-box-bg);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text);
+            display: none; /* Vaikimisi peidus */
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .info-title { font-weight: 700; display: block; margin-bottom: 4px; }
+        
         /* TARK LAADIJA */
         .charger-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .slider-container { width: 100%; margin-bottom: 20px; }
@@ -193,36 +214,6 @@
     </div>
 
     <div class="card">
-        <h2>Kodumasinate kulu hetkel</h2>
-        <div class="appliance-grid">
-            <div class="app-item">
-                <span class="app-icon">🧖‍♂️</span>
-                <span class="app-name">Saun (3h)</span>
-                <span class="app-cost" id="cost-sauna">--</span>
-                <span class="app-best" id="best-sauna">--</span>
-            </div>
-            <div class="app-item">
-                <span class="app-icon">🧺</span>
-                <span class="app-name">Pesu & Kuivati</span>
-                <span class="app-cost" id="cost-wash">--</span>
-                <span class="app-best" id="best-wash">--</span>
-            </div>
-            <div class="app-item">
-                <span class="app-icon">🍳</span>
-                <span class="app-name">Pliit/Ahi (1h)</span>
-                <span class="app-cost" id="cost-stove">--</span>
-                <span class="app-best" id="best-stove">--</span>
-            </div>
-            <div class="app-item">
-                <span class="app-icon">🚗</span>
-                <span class="app-name">Auto (4h)</span>
-                <span class="app-cost" id="cost-car">--</span>
-                <span class="app-best" id="best-car">--</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
         <div class="clock-weather-wrapper">
             <div class="clock-container">
                 <canvas id="clock-canvas"></canvas>
@@ -255,6 +246,41 @@
     </div>
 
     <div class="card">
+        <h2>Kodumasinate kulu hetkel</h2>
+        <div class="appliance-grid">
+            <div class="app-item" onclick="showAppInfo('sauna', this)">
+                <span class="app-icon">🧖‍♂️</span>
+                <span class="app-name">Saun</span>
+                <span class="app-cost" id="cost-sauna">--</span>
+                <span class="app-best" id="best-sauna">--</span>
+            </div>
+            <div class="app-item" onclick="showAppInfo('wash', this)">
+                <span class="app-icon">🧺</span>
+                <span class="app-name">Pesu & Kuivatus</span>
+                <span class="app-cost" id="cost-wash">--</span>
+                <span class="app-best" id="best-wash">--</span>
+            </div>
+            <div class="app-item" onclick="showAppInfo('stove', this)">
+                <span class="app-icon">🍳</span>
+                <span class="app-name">Pliit/Ahi</span>
+                <span class="app-cost" id="cost-stove">--</span>
+                <span class="app-best" id="best-stove">--</span>
+            </div>
+            <div class="app-item" onclick="showAppInfo('car', this)">
+                <span class="app-icon">🚗</span>
+                <span class="app-name">Auto</span>
+                <span class="app-cost" id="cost-car">--</span>
+                <span class="app-best" id="best-car">--</span>
+            </div>
+        </div>
+        
+        <div id="app-info-box">
+            <span class="info-title" id="info-title">Info</span>
+            <span id="info-text">Kliki ikoonil, et näha detaili.</span>
+        </div>
+    </div>
+
+    <div class="card">
         <h2>🚗 Tark Laadija</h2>
         <div class="charger-row">
             <span style="font-weight:600; font-size:14px;">Kestvus: <span style="color:var(--primary); font-size:16px;" id="charge-duration-lbl">4</span>h</span>
@@ -270,7 +296,7 @@
     </div>
 
     <div style="text-align:center; color:var(--subtext); font-size:10px; margin-top:20px;">
-        <span id="last-update-text"></span> • v11.0 Clean
+        <span id="last-update-text"></span> • v12.0 Interactive
     </div>
 
 </div>
@@ -356,15 +382,30 @@
         renderChart();
     }
 
-    // --- KODUMASINAD (UUENDATUD) ---
-    function updateAppliancesMatrix() {
-        const devices = [
-            { id: 'sauna', kw: 9, hours: 3 },
-            { id: 'wash', kw: 2.5, hours: 3 }, // Pesu + Kuivati (raskem tsükkel)
-            { id: 'stove', kw: 2, hours: 1 },  // Pliit (1h kokkamist)
-            { id: 'car', kw: 11, hours: 4 }
-        ];
+    // --- KODUMASINAD & INFO ---
+    const devices = [
+        { id: 'sauna', kw: 9, hours: 3, name: "Elektrikeris", desc: "Arvestatud 9 kW kerisega, kütmine 3 tundi." },
+        { id: 'wash', kw: 2.5, hours: 3, name: "Pesu ja Kuivatus", desc: "Pesumasin + Kuivati täistsükkel (kokku ca 3h)." },
+        { id: 'stove', kw: 2, hours: 1, name: "Elektripliit/Ahi", desc: "Üks tund aktiivset küpsetamist (2 kW)." },
+        { id: 'car', kw: 11, hours: 4, name: "Elektriauto", desc: "Kodus laadimine (11 kW), 4 tunni jooksul." }
+    ];
 
+    function showAppInfo(id, element) {
+        // Remove selection from others
+        document.querySelectorAll('.app-item').forEach(el => el.classList.remove('selected'));
+        // Add to current
+        element.classList.add('selected');
+
+        const dev = devices.find(d => d.id === id);
+        if(dev) {
+            const box = document.getElementById('app-info-box');
+            document.getElementById('info-title').innerText = dev.name;
+            document.getElementById('info-text').innerText = dev.desc;
+            box.style.display = 'block';
+        }
+    }
+
+    function updateAppliancesMatrix() {
         devices.forEach(dev => {
             const costEl = document.getElementById(`cost-${dev.id}`);
             const bestEl = document.getElementById(`best-${dev.id}`);
@@ -464,7 +505,7 @@
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, startAngle, endAngle);
             ctx.lineCap = "round"; ctx.lineWidth = thickness;
-            if(price < settings.lowPrice) ctx.strokeStyle = '#34C759';
+            if(price < settings.lowPrice) ctx.strokeStyle = '#4CAF50';
             else if(price > settings.highPrice) ctx.strokeStyle = '#FF3B30';
             else ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--clock-gray');
             ctx.stroke();
