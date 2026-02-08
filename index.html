@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nutikas Elekter v12</title>
+    <title>Nutikas Elekter v13</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,6 +21,7 @@
             --text: #1d1d1f;
             --subtext: #86868b;
             --danger: #FF3B30;
+            --gold: #FFD700;
             --border: rgba(0,0,0,0.06);
             --modal-bg: rgba(255,255,255,0.98);
             --chart-grid: #E5E5EA;
@@ -46,6 +47,12 @@
             --info-box-bg: #2C2C2E;
         }
 
+        /* SOLAR MODE COLORS override */
+        body.solar-mode {
+            --primary: #FFD700; /* Gold for high price */
+            --danger: #34C759;  /* Green for low price (bad for selling) */
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
@@ -67,7 +74,7 @@
         .app-title { font-weight: 800; font-size: 20px; color: var(--text); letter-spacing: -0.5px; }
         .settings-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--subtext); }
 
-        /* CARD BASE */
+        /* CARD */
         .card {
             background: var(--card);
             border-radius: 24px;
@@ -96,6 +103,10 @@
         .hero-time { font-size: 13px; font-weight: 600; color: var(--subtext); margin-bottom: 4px; }
         .hero-price { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text); }
         .hero-unit { font-size: 15px; color: var(--subtext); font-weight: 500; margin-top: 6px; }
+        
+        /* UUS: TAIMER & PAKETT */
+        .hero-timer { font-size: 13px; font-weight: 700; color: var(--text); background: var(--guru-bg); padding: 4px 10px; border-radius: 12px; display: inline-block; margin-top: 5px; }
+        .hero-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--subtext); margin-bottom: 5px; display: block; font-weight: 700; }
 
         /* GURU BUBBLE */
         .guru-bubble {
@@ -121,6 +132,10 @@
         .clock-lbl { font-size: 11px; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .clock-val { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -1px; line-height: 1; margin-top: 2px; }
         .clock-unit { font-size: 12px; color: var(--subtext); font-weight: 500; margin-top: 2px; }
+        
+        /* NÄDALA KONTEKST */
+        .week-context { font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 5px; }
+        .week-context.bad { color: var(--danger); }
 
         .weather-mini-row { display: flex; width: 100%; justify-content: space-around; padding-top: 15px; border-top: 1px solid var(--border); }
         .wm-item { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -133,20 +148,12 @@
         .chart-box { height: 260px; width: 100%; position: relative; }
         .toggle-day { background: rgba(142, 142, 147, 0.15); border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
 
-        /* KODUMASINATE MAATRIKS (INTERAKTIIVNE) */
+        /* KODUMASINAD */
         .appliance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
         .app-item { 
-            background: var(--appliance-bg); 
-            padding: 12px; 
-            border-radius: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-            position: relative;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 2px solid transparent;
+            background: var(--appliance-bg); padding: 12px; border-radius: 16px; 
+            display: flex; flex-direction: column; align-items: center; text-align: center; 
+            position: relative; cursor: pointer; transition: 0.2s; border: 2px solid transparent;
         }
         .app-item:active { transform: scale(0.98); }
         .app-item.selected { border-color: var(--primary); background: rgba(52, 199, 89, 0.05); }
@@ -156,16 +163,9 @@
         .app-best { font-size: 10px; color: var(--primary); margin-top: 2px; font-weight: 600; }
         .app-badge-expensive { color: var(--danger); }
 
-        /* UUS: KODUMASINA INFO BOX */
         #app-info-box {
-            margin-top: 15px;
-            background: var(--info-box-bg);
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 13px;
-            color: var(--text);
-            display: none; /* Vaikimisi peidus */
-            animation: slideDown 0.3s ease;
+            margin-top: 15px; background: var(--info-box-bg); border-radius: 12px; padding: 12px;
+            font-size: 13px; color: var(--text); display: none; animation: slideDown 0.3s ease;
         }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .info-title { font-weight: 700; display: block; margin-bottom: 4px; }
@@ -180,17 +180,33 @@
         .charge-time { font-size: 18px; font-weight: 700; color: var(--primary); display: block; margin-bottom: 2px; }
         .charge-saving { font-size: 12px; color: var(--subtext); }
 
+        /* LISTID */
+        .list-row { display: flex; gap: 15px; }
+        .list-col { flex: 1; }
+        .list-header { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; }
+        .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .item-row:last-child { border-bottom: none; }
+
         h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--subtext); margin: 0 0 15px 0; letter-spacing: 1px; }
         .hidden { display: none !important; }
         #loader { text-align: center; color: var(--subtext); padding: 40px; }
 
         /* MODAL */
         #settings-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; align-items: flex-end; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--modal-bg); width: 100%; border-radius: 24px 24px 0 0; padding: 30px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .modal-content { background: var(--modal-bg); width: 100%; border-radius: 24px 24px 0 0; padding: 30px 24px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 80vh; overflow-y: auto; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 15px; font-weight: 500; }
         .setting-input { width: 70px; padding: 8px; border-radius: 10px; border: none; background: rgba(142,142,147,0.15); text-align: center; font-size: 16px; color: var(--text); font-weight: 600; }
+        .setting-select { padding: 8px; border-radius: 10px; border: none; background: rgba(142,142,147,0.15); font-size: 14px; color: var(--text); font-weight: 600; text-align:right;}
         .close-btn { width: 100%; padding: 16px; background: var(--text); border: none; border-radius: 16px; color: var(--card); font-weight: 700; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        
+        /* TOGGLE SWITCH */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
     </style>
 </head>
@@ -206,9 +222,12 @@
     <div class="card hero" id="hero-card">
         <div id="loader">Laen andmeid...</div>
         <div id="main-content" class="hidden">
+            <span class="hero-badge" id="price-type-badge">Börsihind</span>
             <div id="current-time" class="hero-time">--:--</div>
             <div id="current-price" class="hero-price">--</div>
             <div class="hero-unit">senti / kWh (KM <span id="vat-display">24</span>%)</div>
+            
+            <div class="hero-timer" id="hero-timer">...</div>
             <div class="guru-bubble" id="guru-text">...</div>
         </div>
     </div>
@@ -221,6 +240,7 @@
                     <div class="clock-lbl">Keskmine</div>
                     <div class="clock-val" id="day-avg">--</div>
                     <div class="clock-unit">s/kWh</div>
+                    <div class="week-context" id="week-context"></div>
                 </div>
             </div>
             <div class="weather-mini-row">
@@ -249,35 +269,23 @@
         <h2>Kodumasinate kulu hetkel</h2>
         <div class="appliance-grid">
             <div class="app-item" onclick="showAppInfo('sauna', this)">
-                <span class="app-icon">🧖‍♂️</span>
-                <span class="app-name">Saun</span>
-                <span class="app-cost" id="cost-sauna">--</span>
-                <span class="app-best" id="best-sauna">--</span>
+                <span class="app-icon">🧖‍♂️</span><span class="app-name">Saun</span>
+                <span class="app-cost" id="cost-sauna">--</span><span class="app-best" id="best-sauna">--</span>
             </div>
             <div class="app-item" onclick="showAppInfo('wash', this)">
-                <span class="app-icon">🧺</span>
-                <span class="app-name">Pesu & Kuivatus</span>
-                <span class="app-cost" id="cost-wash">--</span>
-                <span class="app-best" id="best-wash">--</span>
+                <span class="app-icon">🧺</span><span class="app-name">Pesu+Kuivati</span>
+                <span class="app-cost" id="cost-wash">--</span><span class="app-best" id="best-wash">--</span>
             </div>
             <div class="app-item" onclick="showAppInfo('stove', this)">
-                <span class="app-icon">🍳</span>
-                <span class="app-name">Pliit/Ahi</span>
-                <span class="app-cost" id="cost-stove">--</span>
-                <span class="app-best" id="best-stove">--</span>
+                <span class="app-icon">🍳</span><span class="app-name">Pliit/Ahi</span>
+                <span class="app-cost" id="cost-stove">--</span><span class="app-best" id="best-stove">--</span>
             </div>
             <div class="app-item" onclick="showAppInfo('car', this)">
-                <span class="app-icon">🚗</span>
-                <span class="app-name">Auto</span>
-                <span class="app-cost" id="cost-car">--</span>
-                <span class="app-best" id="best-car">--</span>
+                <span class="app-icon">🚗</span><span class="app-name">Auto</span>
+                <span class="app-cost" id="cost-car">--</span><span class="app-best" id="best-car">--</span>
             </div>
         </div>
-        
-        <div id="app-info-box">
-            <span class="info-title" id="info-title">Info</span>
-            <span id="info-text">Kliki ikoonil, et näha detaili.</span>
-        </div>
+        <div id="app-info-box"><span class="info-title" id="info-title">Info</span><span id="info-text"></span></div>
     </div>
 
     <div class="card">
@@ -295,8 +303,15 @@
         </div>
     </div>
 
+    <div class="card">
+        <div class="list-row">
+            <div class="list-col"><div class="list-header">🟢 SOODNE</div><div id="list-cheap"></div></div>
+            <div class="list-col"><div class="list-header" style="color:var(--danger)">🔴 KALLIS</div><div id="list-expensive"></div></div>
+        </div>
+    </div>
+
     <div style="text-align:center; color:var(--subtext); font-size:10px; margin-top:20px;">
-        <span id="last-update-text"></span> • v12.0 Interactive
+        <span id="last-update-text"></span> • v13.0 Power User
     </div>
 
 </div>
@@ -304,20 +319,53 @@
 <div id="settings-modal">
     <div class="modal-content">
         <h2 style="font-size:18px; color:var(--text); margin-bottom:25px; border-bottom:none;">Sätted</h2>
-        <div class="setting-row"><span>Tume režiim</span><button class="toggle-day" onclick="toggleTheme()" id="theme-toggle-btn">Auto</button></div>
+        
+        <div class="setting-row">
+            <span>Tume režiim</span>
+            <button class="toggle-day" onclick="toggleTheme()" id="theme-toggle-btn">Auto</button>
+        </div>
+
+        <div class="setting-row">
+            <span>☀️ Oman päikesepaneele</span>
+            <label class="switch">
+                <input type="checkbox" id="set-solar" onchange="toggleSolarSettings()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-row">
+            <span>Võrgupakett</span>
+            <select id="set-network" class="setting-select">
+                <option value="none">Ainult Börsihind</option>
+                <option value="vork1">Võrk 1 (Põhi)</option>
+                <option value="vork2">Võrk 2 (Päev/Öö)</option>
+            </select>
+        </div>
+
         <div class="setting-row"><span>Käibemaks (%)</span><input type="number" id="set-vat" class="setting-input" value="24"></div>
-        <div class="setting-row"><span>Odava piir (s/kWh)</span><input type="number" id="set-low" class="setting-input" value="5"></div>
-        <div class="setting-row"><span>Kalli piir (s/kWh)</span><input type="number" id="set-high" class="setting-input" value="15"></div>
-        <button class="close-btn" onclick="saveSettings()">Valmis</button>
+        <div class="setting-row"><span>Odava piir (s)</span><input type="number" id="set-low" class="setting-input" value="5"></div>
+        <div class="setting-row"><span>Kalli piir (s)</span><input type="number" id="set-high" class="setting-input" value="15"></div>
+        
+        <button class="close-btn" onclick="saveSettings()">Salvesta</button>
     </div>
 </div>
 
 <script>
-    let settings = { vat: 1.24, lowPrice: 5, highPrice: 15, theme: 'auto' };
-    let appData = { today: [], tomorrow: [], all: [], todayAvg: 0 };
+    // GLOBAL STATE
+    let settings = { vat: 1.24, lowPrice: 5, highPrice: 15, theme: 'auto', network: 'none', solar: false };
+    let appData = { today: [], tomorrow: [], all: [], history: [], todayAvg: 0 };
     let weatherInfo = { wind: 0, temp: 0 };
     let chartInstance = null;
     let lastLoadedHour = -1;
+
+    // CONSTANTS FOR FEES (Estonia aprox)
+    const FEE_RENEWABLE = 1.13; // s/kWh (excl VAT)
+    const FEE_EXCISE = 0.1;     // s/kWh (excl VAT)
+    const NETWORK_FEES = {
+        'none': { day: 0, night: 0 },
+        'vork1': { day: 4.76, night: 4.76 }, // Fixed approx
+        'vork2': { day: 6.95, night: 3.99 }  // Day/Night approx
+    };
 
     document.addEventListener("DOMContentLoaded", () => {
         loadSettings(); applyTheme(); loadCache(); init();
@@ -327,11 +375,12 @@
 
     function checkAndReload() {
         const h = new Date().getHours();
-        if (lastLoadedHour !== -1 && h !== lastLoadedHour) window.location.reload(); else getElectricity();
+        if (lastLoadedHour !== -1 && h !== lastLoadedHour) window.location.reload(); 
+        else { updateHeroTimer(); updateHero(); } // Update timer every minute
     }
 
     async function init() {
-        await Promise.all([getElectricity(), getWeather()]);
+        await Promise.all([getElectricity(), getWeather(), getHistory()]);
         lastLoadedHour = new Date().getHours();
         document.getElementById('last-update-text').innerText = "Värskendatud: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
@@ -357,9 +406,41 @@
         if (rawData) { processElectricity(rawData); localStorage.setItem('elekter_data', JSON.stringify(rawData)); }
     }
 
+    async function getHistory() {
+        // Fetch 7 days ago to compare
+        const today = new Date();
+        const past = new Date(today); past.setDate(today.getDate() - 7);
+        const start = past.toISOString();
+        const end = today.toISOString();
+        const apiURL = `https://dashboard.elering.ee/api/nps/price?start=${start}&end=${end}`;
+        try {
+            const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(apiURL)}`);
+            if (r.ok) {
+                const j = await r.json();
+                appData.history = j.data.ee;
+                updateWeeklyContext();
+            }
+        } catch(e) {}
+    }
+
     function loadCache() {
         const cached = localStorage.getItem('elekter_data');
         if(cached) try { processElectricity(JSON.parse(cached)); } catch(e){}
+    }
+
+    function calculateFinalPrice(item) {
+        const date = new Date(item.timestamp * 1000);
+        const hour = date.getHours();
+        const isNight = (hour >= 22 || hour < 7) || (date.getDay() === 0 || date.getDay() === 6); // Sat/Sun are night tariff often? Let's assume standard logic.
+        
+        let networkFee = 0;
+        if (settings.network === 'vork2') networkFee = isNight ? NETWORK_FEES.vork2.night : NETWORK_FEES.vork2.day;
+        else networkFee = NETWORK_FEES[settings.network].day;
+
+        const fees = (settings.network === 'none') ? 0 : (networkFee + FEE_RENEWABLE + FEE_EXCISE);
+        
+        // Base price * VAT + Fees * VAT
+        return (item.price / 10 * settings.vat) + (fees * settings.vat);
     }
 
     function processElectricity(data) {
@@ -380,28 +461,220 @@
         renderClock();
         calcSmartCharge(); 
         renderChart();
+        updateLists();
+    }
+
+    // --- LOGIC ---
+    function updateHero() {
+        const nowTs = Math.floor(Date.now()/1000/3600)*3600;
+        const curr = appData.today.find(d => d.timestamp === nowTs);
+        const card = document.getElementById('hero-card');
+        const priceEl = document.getElementById('current-price');
+        
+        document.getElementById('price-type-badge').innerText = settings.network === 'none' ? "Börsihind" : "Lõpphind";
+
+        card.classList.remove('effect-aurora', 'effect-pulse');
+
+        if(curr) {
+            const price = calculateFinalPrice(curr);
+            priceEl.innerText = price.toFixed(2);
+            document.getElementById('current-time').innerText = new Date().getHours() + ":00 – " + (new Date().getHours()+1) + ":00";
+            
+            updateGuru(price);
+            updateHeroTimer(price);
+
+            // COLOR LOGIC (Inverted if Solar)
+            let isGood = price < settings.lowPrice;
+            let isBad = price > settings.highPrice;
+            
+            if (settings.solar) { isGood = price > settings.highPrice; isBad = price < settings.lowPrice; }
+
+            if(isGood) {
+                card.classList.add('effect-aurora');
+                priceEl.style.color = settings.solar ? '#FFD700' : 'var(--primary)'; 
+            } else if (isBad) {
+                card.classList.add('effect-pulse');
+                priceEl.style.color = settings.solar ? 'var(--primary)' : 'var(--danger)'; 
+            } else {
+                priceEl.style.color = 'var(--text)';
+            }
+        }
+        document.getElementById('day-avg').innerText = appData.todayAvg;
+    }
+
+    function updateHeroTimer(currentPrice) {
+        const now = new Date();
+        const currentH = now.getHours();
+        
+        // Find next change
+        let nextChangeH = -1;
+        const isCurrentlyGood = currentPrice < settings.lowPrice; // Simple check based on current state
+        
+        for (let i = currentH + 1; i < 24; i++) {
+            const p = calculateFinalPrice(appData.today[i]);
+            const isFutureGood = p < settings.lowPrice;
+            if (isCurrentlyGood !== isFutureGood) {
+                nextChangeH = i;
+                break;
+            }
+        }
+
+        const timerEl = document.getElementById('hero-timer');
+        if (nextChangeH !== -1) {
+            const diffH = nextChangeH - currentH - 1;
+            const diffM = 60 - now.getMinutes();
+            timerEl.innerText = `${isCurrentlyGood ? 'Odav' : 'Kallis'} lõpeb: ${diffH}h ${diffM}min`;
+            timerEl.style.color = isCurrentlyGood ? 'var(--primary)' : 'var(--danger)';
+        } else {
+            timerEl.innerText = "Stabiilne hind";
+            timerEl.style.color = 'var(--subtext)';
+        }
+    }
+
+    function updateWeeklyContext() {
+        if (!appData.history.length || !appData.todayAvg) return;
+        const histSum = appData.history.reduce((a, b) => a + b.price, 0);
+        const histAvg = (histSum / appData.history.length / 10 * settings.vat); // Base avg
+        
+        // Compare base avgs
+        const diff = ((appData.todayAvg - histAvg) / histAvg * 100);
+        const el = document.getElementById('week-context');
+        
+        if (diff < -5) {
+            el.innerText = `📉 ${Math.abs(diff).toFixed(0)}% odavam kui nädala keskmine`;
+            el.className = "week-context"; // Good (green)
+        } else if (diff > 5) {
+            el.innerText = `📈 ${diff.toFixed(0)}% kallim kui nädala keskmine`;
+            el.className = "week-context bad"; // Bad (red)
+        } else {
+            el.innerText = "Nädala keskmise tasemel";
+            el.className = "week-context";
+            el.style.color = 'var(--subtext)';
+        }
+    }
+
+    function updateGuru(price) {
+        const el = document.getElementById('guru-text');
+        let msg = "";
+        
+        if (settings.solar) {
+            // PROSUMER MESSAGES
+            if (price > settings.highPrice) msg = "💰 Müügiparadiis! Pane paneelid täie rauaga tööle.";
+            else if (price < 0) msg = "⚠️ Negatiivne hind! Lülita inverter välja.";
+            else if (price < settings.lowPrice) msg = "Odav elekter. Tarbi ise, ära müü.";
+            else msg = "Keskmine hind. Tee nagu heaks arvad.";
+        } else {
+            // CONSUMER MESSAGES
+            if (price < 1) msg = "Tasuta elekter! 🎉 Küta sauna ja lae autot.";
+            else if (price < settings.lowPrice) msg = "Roheline tuli! ✅ Pesumasinad tööle.";
+            else if (price > 30) msg = "Röövlite hind! 🤬 Lülita kõik välja!";
+            else if (price > settings.highPrice) msg = "Kallis! 🔴 Oota tarbimisega.";
+            else msg = "Mõistlik hind. 👌 Tarbi rahulikult.";
+        }
+        
+        if (weatherInfo.wind > 6 && price < 15) msg += " (Tuul puhub hinna alla 🌬)";
+        el.innerText = msg;
+    }
+
+    // --- CHART & CLOCK ---
+    function getAvg(arr) {
+        if(!arr.length) return 0;
+        const sum = arr.reduce((acc, i) => acc + calculateFinalPrice(i), 0);
+        return (sum / arr.length).toFixed(2);
+    }
+
+    function renderClock() {
+        const canvas = document.getElementById('clock-canvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const size = 200; canvas.width = size * dpr; canvas.height = size * dpr; ctx.scale(dpr, dpr);
+        const centerX = size/2; const centerY = size/2; const radius = size/2 - 10;
+        ctx.clearRect(0, 0, size, size);
+
+        appData.today.forEach(item => {
+            const date = new Date(item.timestamp * 1000);
+            const hour = date.getHours();
+            const price = calculateFinalPrice(item);
+            const startAngle = (hour * (Math.PI * 2 / 24)) + 0.05;
+            const endAngle = ((hour + 1) * (Math.PI * 2 / 24)) - 0.05;
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.lineCap = "round"; ctx.lineWidth = 6;
+
+            if (settings.solar) {
+                if (price > settings.highPrice) ctx.strokeStyle = '#FFD700'; // Gold
+                else if (price < settings.lowPrice) ctx.strokeStyle = '#34C759'; // Green (Consuming is cheap)
+                else ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--clock-gray');
+            } else {
+                if(price < settings.lowPrice) ctx.strokeStyle = '#4CAF50';
+                else if(price > settings.highPrice) ctx.strokeStyle = '#FF3B30';
+                else ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--clock-gray');
+            }
+            ctx.stroke();
+        });
+        
+        // Indicator
+        const currentH = new Date().getHours();
+        const angle = (currentH * (Math.PI * 2 / 24)) + (Math.PI / 24); 
+        ctx.beginPath(); ctx.arc(centerX + (radius - 12) * Math.cos(angle), centerY + (radius - 12) * Math.sin(angle), 3, 0, Math.PI * 2);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.fill();
+    }
+
+    function renderChart() {
+        const mode = document.getElementById('day-select').value;
+        let data = mode === 'today' ? appData.today : appData.tomorrow;
+        if (mode === 'today') { const currentH = new Date().getHours(); data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH); }
+        
+        if(!data.length) { document.getElementById('priceChart').style.display = 'none'; document.getElementById('no-data-msg').classList.remove('hidden'); return; }
+        else { document.getElementById('priceChart').style.display = 'block'; document.getElementById('no-data-msg').classList.add('hidden'); }
+
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        const labels = data.map(d => new Date(d.timestamp*1000).getHours());
+        const values = data.map(d => parseFloat(calculateFinalPrice(d).toFixed(2)));
+        
+        if(chartInstance) chartInstance.destroy();
+
+        const segmentColor = ctx => { 
+            const v = ctx.p0.parsed.y; 
+            if (settings.solar) return v > settings.highPrice ? '#FFD700' : (v < settings.lowPrice ? '#34C759' : '#FF9500');
+            return v < settings.lowPrice ? '#4CAF50' : (v > settings.highPrice ? '#FF3B30' : '#FF9500'); 
+        };
+        
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Hind', data: values, borderWidth: 3, stepped: true, fill: true, backgroundColor: 'rgba(0,0,0,0)',
+                    segment: { borderColor: ctx => segmentColor(ctx) },
+                    pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, pointBackgroundColor: settings.solar ? '#FFD700' : '#34C759'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false } },
+                scales: { x: { grid: { display:false } }, y: { beginAtZero: true, grid: { color: getComputedStyle(document.body).getPropertyValue('--chart-grid') } } }
+            }
+        });
     }
 
     // --- KODUMASINAD & INFO ---
     const devices = [
-        { id: 'sauna', kw: 9, hours: 3, name: "Elektrikeris", desc: "Arvestatud 9 kW kerisega, kütmine 3 tundi." },
-        { id: 'wash', kw: 2.5, hours: 3, name: "Pesu ja Kuivatus", desc: "Pesumasin + Kuivati täistsükkel (kokku ca 3h)." },
-        { id: 'stove', kw: 2, hours: 1, name: "Elektripliit/Ahi", desc: "Üks tund aktiivset küpsetamist (2 kW)." },
-        { id: 'car', kw: 11, hours: 4, name: "Elektriauto", desc: "Kodus laadimine (11 kW), 4 tunni jooksul." }
+        { id: 'sauna', kw: 9, hours: 3, name: "Elektrikeris", desc: "9 kW keris, kütmine 3 tundi." },
+        { id: 'wash', kw: 2.5, hours: 3, name: "Pesu ja Kuivatus", desc: "Pesumasin + Kuivati (3h)." },
+        { id: 'stove', kw: 2, hours: 1, name: "Elektripliit/Ahi", desc: "1 tund kokkamist (2 kW)." },
+        { id: 'car', kw: 11, hours: 4, name: "Elektriauto", desc: "Kodus laadimine (11 kW), 4h." }
     ];
 
     function showAppInfo(id, element) {
-        // Remove selection from others
         document.querySelectorAll('.app-item').forEach(el => el.classList.remove('selected'));
-        // Add to current
         element.classList.add('selected');
-
         const dev = devices.find(d => d.id === id);
         if(dev) {
-            const box = document.getElementById('app-info-box');
             document.getElementById('info-title').innerText = dev.name;
             document.getElementById('info-text').innerText = dev.desc;
-            box.style.display = 'block';
+            document.getElementById('app-info-box').style.display = 'block';
         }
     }
 
@@ -414,109 +687,37 @@
             
             if (startIndex !== -1 && startIndex + dev.hours <= appData.all.length) {
                 let sumCurrent = 0;
-                for(let i=0; i<dev.hours; i++) sumCurrent += (appData.all[startIndex + i].price / 10 * settings.vat);
+                for(let i=0; i<dev.hours; i++) sumCurrent += calculateFinalPrice(appData.all[startIndex + i]);
                 const avgCurrent = sumCurrent / dev.hours;
                 const totalCostCurrent = avgCurrent * dev.kw * dev.hours / 100;
                 
                 costEl.innerText = totalCostCurrent.toFixed(2) + "€";
-                
-                if (avgCurrent > settings.highPrice) {
-                    costEl.classList.add('app-badge-expensive');
-                    costEl.style.color = 'var(--danger)';
-                } else {
-                    costEl.classList.remove('app-badge-expensive');
-                    costEl.style.color = 'var(--text)';
-                }
+                if (avgCurrent > settings.highPrice) { costEl.classList.add('app-badge-expensive'); costEl.style.color = 'var(--danger)'; } 
+                else { costEl.classList.remove('app-badge-expensive'); costEl.style.color = 'var(--text)'; }
 
                 let minSum = Infinity;
                 for(let i=startIndex; i <= appData.all.length - dev.hours; i++) {
-                    let s = 0;
-                    for(let j=0; j<dev.hours; j++) s += appData.all[i+j].price;
+                    let s = 0; for(let j=0; j<dev.hours; j++) s += calculateFinalPrice(appData.all[i+j]);
                     if(s < minSum) minSum = s;
                 }
-                const bestAvg = (minSum / dev.hours) / 10 * settings.vat;
-                const bestCost = bestAvg * dev.kw * dev.hours / 100;
-                
-                if (totalCostCurrent > bestCost * 1.1) bestEl.innerText = `Parim: ${bestCost.toFixed(2)}€`;
-                else bestEl.innerText = "Parim aeg! ✅";
-
-            } else {
-                costEl.innerText = "--";
-            }
+                const bestCost = (minSum / dev.hours) * dev.kw * dev.hours / 100;
+                if (totalCostCurrent > bestCost * 1.1) bestEl.innerText = `Parim: ${bestCost.toFixed(2)}€`; else bestEl.innerText = "Parim aeg! ✅";
+            } else { costEl.innerText = "--"; }
         });
     }
 
-    function updateGuru(price) {
-        const el = document.getElementById('guru-text');
-        let msg = "";
-        if (price < 1) msg = "Tasuta elekter! 🎉 Küta sauna ja lae autot.";
-        else if (price < settings.lowPrice) msg = "Roheline tuli! ✅ Pesumasinad ja boilerid tööle.";
-        else if (price > 30) msg = "Röövlite hind! 🤬 Lülita absoluutselt kõik välja!";
-        else if (price > settings.highPrice) msg = "Hind on krõbe! 🔴 Lükka tarbimine hilisemaks.";
-        else msg = "Mõistlik hind. 👌 Tarbi rahulikult.";
-        if (weatherInfo.wind > 6 && price < 15) msg += " (Tuul puhub hinna alla 🌬)";
-        el.innerText = msg;
-    }
-
-    function updateHero() {
-        const nowTs = Math.floor(Date.now()/1000/3600)*3600;
-        const curr = appData.today.find(d => d.timestamp === nowTs);
-        const card = document.getElementById('hero-card');
-        const priceEl = document.getElementById('current-price');
-        card.classList.remove('effect-aurora', 'effect-pulse');
-
-        if(curr) {
-            const price = (curr.price / 10 * settings.vat);
-            priceEl.innerText = price.toFixed(2);
-            document.getElementById('current-time').innerText = new Date().getHours() + ":00 – " + (new Date().getHours()+1) + ":00";
-            updateGuru(price);
-            if(price < settings.lowPrice) { card.classList.add('effect-aurora'); priceEl.style.color = 'var(--primary)'; } 
-            else if (price > settings.highPrice) { card.classList.add('effect-pulse'); priceEl.style.color = 'var(--danger)'; } 
-            else { priceEl.style.color = 'var(--text)'; }
-        }
-        document.getElementById('day-avg').innerText = appData.todayAvg;
-    }
-
-    function getAvg(arr) {
-        if(!arr.length) return 0;
-        const sum = arr.reduce((acc, i) => acc + (i.price/10*settings.vat), 0);
-        return (sum / arr.length).toFixed(2);
-    }
-
-    function renderClock() {
-        const canvas = document.getElementById('clock-canvas');
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const size = 200;
-        canvas.width = size * dpr; canvas.height = size * dpr;
-        ctx.scale(dpr, dpr);
-        const centerX = size/2; const centerY = size/2;
-        const radius = size/2 - 10;
-        const thickness = 6;
-        ctx.clearRect(0, 0, size, size);
-
-        appData.today.forEach(item => {
-            const date = new Date(item.timestamp * 1000);
-            const hour = date.getHours();
-            const price = (item.price / 10 * settings.vat);
-            const gap = 0.05; 
-            const startAngle = (hour * (Math.PI * 2 / 24)) + gap;
-            const endAngle = ((hour + 1) * (Math.PI * 2 / 24)) - gap;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-            ctx.lineCap = "round"; ctx.lineWidth = thickness;
-            if(price < settings.lowPrice) ctx.strokeStyle = '#4CAF50';
-            else if(price > settings.highPrice) ctx.strokeStyle = '#FF3B30';
-            else ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--clock-gray');
-            ctx.stroke();
-        });
-
-        const currentH = new Date().getHours();
-        const angle = (currentH * (Math.PI * 2 / 24)) + (Math.PI / 24); 
-        const indicatorX = centerX + (radius - 12) * Math.cos(angle);
-        const indicatorY = centerY + (radius - 12) * Math.sin(angle);
-        ctx.beginPath(); ctx.arc(indicatorX, indicatorY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.fill();
+    function updateLists() {
+        const data = appData.today; if(!data.length) return;
+        const sorted = [...data].sort((a,b) => calculateFinalPrice(a) - calculateFinalPrice(b));
+        const render = (arr, elId, color) => {
+            document.getElementById(elId).innerHTML = arr.map(i => {
+                const p = calculateFinalPrice(i).toFixed(1);
+                const h = new Date(i.timestamp*1000).getHours().toString().padStart(2,'0');
+                return `<div class="item-row"><span>${h}:00</span><span style="color:${color}; font-weight:700;">${p} s</span></div>`;
+            }).join('');
+        };
+        render(sorted.slice(0,3), 'list-cheap', 'var(--primary)');
+        render(sorted.slice(-3).reverse(), 'list-expensive', 'var(--danger)');
     }
 
     function calcSmartCharge() {
@@ -524,96 +725,45 @@
         document.getElementById('charge-duration-lbl').innerText = duration;
         const nowTs = Math.floor(Date.now()/1000/3600)*3600;
         const futureData = appData.all.filter(d => d.timestamp >= nowTs);
-
-        if(futureData.length < duration) { document.getElementById('best-charge-time').innerText = "Andmed puuduvad"; return; }
+        if(futureData.length < duration) return;
 
         let bestAvg = Infinity; let bestStartItem = null;
         for(let i=0; i <= futureData.length - duration; i++) {
-            let sum = 0; for(let j=0; j<duration; j++) sum += futureData[i+j].price;
+            let sum = 0; for(let j=0; j<duration; j++) sum += calculateFinalPrice(futureData[i+j]);
             let avg = sum / duration;
             if(avg < bestAvg) { bestAvg = avg; bestStartItem = futureData[i]; }
         }
-
         if(bestStartItem) {
             const d = new Date(bestStartItem.timestamp * 1000);
-            const price = (bestAvg / 10 * settings.vat).toFixed(2);
-            let dayText = d.getDate() !== new Date().getDate() ? "Homme" : "Täna";
-            document.getElementById('best-charge-time').innerText = `${dayText} kell ${d.getHours()}:00`;
-            document.getElementById('charge-avg-price').innerText = `Keskm. hind: ${price} s/kWh`;
+            document.getElementById('best-charge-time').innerText = `${d.getDate() !== new Date().getDate() ? "Homme" : "Täna"} kell ${d.getHours()}:00`;
+            document.getElementById('charge-avg-price').innerText = `Keskm. hind: ${bestAvg.toFixed(2)} s/kWh`;
         }
     }
 
     async function getWeather() {
         try {
             const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude=57.848&longitude=27.014&current=temperature_2m,wind_speed_10m,cloud_cover,is_day");
-            const j = await r.json();
-            const curr = j.current;
-            weatherInfo.temp = curr.temperature_2m;
-            weatherInfo.wind = curr.wind_speed_10m / 3.6;
+            const j = await r.json(); const curr = j.current;
+            weatherInfo.temp = curr.temperature_2m; weatherInfo.wind = curr.wind_speed_10m / 3.6;
             document.getElementById('w-temp').innerText = Math.round(weatherInfo.temp) + "°";
             document.getElementById('w-wind').innerText = Math.round(weatherInfo.wind) + " m/s";
-            let solarText = "Madal";
-            if (curr.is_day === 1 && curr.cloud_cover < 30) solarText = "Kõrge";
-            else if (curr.is_day === 1 && curr.cloud_cover < 70) solarText = "Keskm.";
-            else if (curr.is_day === 0) solarText = "Öö";
-            document.getElementById('w-solar').innerText = solarText;
+            document.getElementById('w-solar').innerText = (curr.is_day && curr.cloud_cover < 30) ? "Kõrge" : (curr.is_day && curr.cloud_cover < 70) ? "Keskm." : "Madal";
         } catch(e) {}
     }
 
-    function renderChart() {
-        const mode = document.getElementById('day-select').value;
-        let data = mode === 'today' ? appData.today : appData.tomorrow;
-        if (mode === 'today') {
-            const currentH = new Date().getHours();
-            data = data.filter(d => new Date(d.timestamp * 1000).getHours() >= currentH);
-        }
-        if(!data.length) {
-            document.getElementById('priceChart').style.display = 'none';
-            document.getElementById('no-data-msg').classList.remove('hidden');
-            return;
-        } else {
-            document.getElementById('priceChart').style.display = 'block';
-            document.getElementById('no-data-msg').classList.add('hidden');
-        }
-
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        const labels = data.map(d => new Date(d.timestamp*1000).getHours());
-        const values = data.map(d => parseFloat((d.price/10*settings.vat).toFixed(2)));
-        
-        if(chartInstance) chartInstance.destroy();
-
-        const textColor = getComputedStyle(document.body).getPropertyValue('--subtext');
-        const gridColor = getComputedStyle(document.body).getPropertyValue('--chart-grid');
-        const segmentColor = ctx => { const v = ctx.p0.parsed.y; if(v < settings.lowPrice) return '#4CAF50'; if(v > settings.highPrice) return '#FF3B30'; return '#FF9500'; };
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(52, 199, 89, 0.2)'); gradient.addColorStop(1, 'rgba(52, 199, 89, 0.0)');
-
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Hind', data: values, borderWidth: 3, stepped: true, fill: true, backgroundColor: gradient,
-                    segment: { borderColor: ctx => segmentColor(ctx) },
-                    pointRadius: (ctx) => (ctx.dataIndex === 0) ? 6 : 0, pointBackgroundColor: '#34C759', pointBorderColor: '#fff', pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Hind: ${c.raw} s` } } },
-                scales: { x: { grid: { display:false }, ticks: { maxTicksLimit: 8, autoSkip: true, maxRotation: 0, color: textColor } }, y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } } }
-            }
-        });
-    }
-
+    // SETTINGS
     function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function toggleSolarSettings() { settings.solar = document.getElementById('set-solar').checked; }
     function saveSettings() {
         settings.vat = parseFloat(document.getElementById('set-vat').value) / 100 + 1;
         settings.lowPrice = parseFloat(document.getElementById('set-low').value);
         settings.highPrice = parseFloat(document.getElementById('set-high').value);
+        settings.network = document.getElementById('set-network').value;
+        settings.solar = document.getElementById('set-solar').checked;
         localStorage.setItem('user_settings', JSON.stringify(settings));
         document.getElementById('settings-modal').style.display = 'none';
         document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
+        if(settings.solar) document.body.classList.add('solar-mode'); else document.body.classList.remove('solar-mode');
         processElectricity(appData.all);
     }
     function loadSettings() {
@@ -624,8 +774,11 @@
             document.getElementById('set-low').value = s.lowPrice;
             document.getElementById('set-high').value = s.highPrice;
             document.getElementById('vat-display').innerText = document.getElementById('set-vat').value;
+            document.getElementById('set-network').value = s.network || 'none';
+            document.getElementById('set-solar').checked = s.solar || false;
             settings = s;
             if(settings.theme) applyTheme();
+            if(settings.solar) document.body.classList.add('solar-mode');
         }
     }
     function toggleTheme() { settings.theme = (settings.theme === 'auto') ? 'dark' : (settings.theme === 'dark' ? 'light' : 'auto'); applyTheme(); }
